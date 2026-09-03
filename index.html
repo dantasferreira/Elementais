@@ -18,6 +18,13 @@
     .badge-dourado { background: rgba(234, 179, 8, 0.2); color: #fde047; border: 1px solid rgba(234, 179, 8, 0.4); }
     .badge-trapaca { background: rgba(168, 85, 247, 0.2); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.4); }
     .badge-mitico { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); }
+
+    /* Efeito de Domínio (Coroa) */
+    .card-crowned {
+      border-color: rgba(245, 158, 11, 0.8) !important;
+      background: linear-gradient(135deg, rgba(30, 27, 75, 0.5), rgba(120, 53, 15, 0.25)) !important;
+      box-shadow: 0 0 15px rgba(245, 158, 11, 0.25);
+    }
   </style>
 
   <!-- Firebase SDK -->
@@ -79,14 +86,80 @@
           descricao: el.desc,
           versao: t.tipo,
           badgeClass: t.badgeClass,
-          img: "" // Exemplo: "imagens/1.png" ou URL web
+          img: "" 
         });
         counter++;
       });
     });
 
+    // Mapeamento de Imagens
+    elementaisData[0].img = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQl2c_kWA6-G_7L7I_BUevvRit8vh5SC4unjxldblQ&s=10";
+    elementaisData[1].img = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQhbvsxQn9Bnf9h2mUAu-u2sE19BudaKuAqRGRYaG8PtA&s=10";
+    elementaisData[2].img = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQyva4CFapO1KbWkZlWYgbnIV1ZYm2KWDLi4GZ9vutZDA&s=10";
+    elementaisData[3].img = "#";
+    elementaisData[4].img = "#";
+    elementaisData[5].img = "#";
+    elementaisData[6].img = "#";
+    elementaisData[7].img = "#";
+    elementaisData[8].img = "#";
+    elementaisData[9].img = "#";
+    elementaisData[10].img = "#";
+    elementaisData[11].img = "#";
+    elementaisData[12].img = "#";
+    elementaisData[13].img = "#";
+    elementaisData[14].img = "#";
+    elementaisData[15].img = "#";
+    elementaisData[16].img = "#";
+    elementaisData[17].img = "#";
+    elementaisData[18].img = "#";
+    elementaisData[19].img = "#";
+    elementaisData[20].img = "#";
+    elementaisData[21].img = "#";
+    elementaisData[22].img = "#";
+    elementaisData[23].img = "#";
+    elementaisData[24].img = "#";
+    elementaisData[25].img = "#";
+    elementaisData[26].img = "#";
+    elementaisData[27].img = "#";
+    elementaisData[28].img = "#";
+    elementaisData[29].img = "#";
+    elementaisData[30].img = "#";
+    elementaisData[31].img = "#";
+    elementaisData[32].img = "#";
+    elementaisData[33].img = "#";
+    elementaisData[34].img = "#";
+    elementaisData[35].img = "#";
+    elementaisData[36].img = "#";
+    elementaisData[37].img = "#";
+    elementaisData[38].img = "#";
+    elementaisData[39].img = "#";
+    elementaisData[40].img = "#";
+    elementaisData[41].img = "#";
+    elementaisData[42].img = "#";
+    elementaisData[43].img = "#";
+    elementaisData[44].img = "#";
+    elementaisData[45].img = "#";
+    elementaisData[46].img = "#";
+    elementaisData[47].img = "#";
+    elementaisData[48].img = "#";
+    elementaisData[49].img = "#";
+    elementaisData[50].img = "#";
+    elementaisData[51].img = "#";
+    elementaisData[52].img = "#";
+    elementaisData[53].img = "#";
+    elementaisData[54].img = "#";
+    elementaisData[55].img = "#";
+    elementaisData[56].img = "#";
+    elementaisData[57].img = "#";
+    elementaisData[58].img = "#";
+    elementaisData[59].img = "#";
+    elementaisData[60].img = "#";
+    elementaisData[61].img = "#";
+    elementaisData[62].img = "#";
+    elementaisData[63].img = "#";
+
     // Variáveis de controle de filtro
-    let currentFilter = 'all'; // 'all', 'checked', 'missing'
+    let currentFilter = 'all'; // 'all', 'checked', 'crowned', 'missing'
     let searchTerm = '';
     let currentState = {};
 
@@ -96,82 +169,17 @@
     elementaisData.forEach(item => {
       const card = document.createElement('div');
       card.id = `card-${item.id}`;
-      card.className = "relative flex flex-col justify-between p-3 rounded-xl border border-slate-800 bg-slate-900/90 hover:border-slate-600 transition-all cursor-pointer select-none group";
+      card.className = "relative flex flex-col justify-between p-3 rounded-xl border border-slate-800 bg-slate-900/90 hover:border-slate-600 transition-all select-none group";
 
-    // Exemplo: definindo a imagem do Elemental Aventura Normal (#1) e Dourado (#2) inserção de imagem
-      elementaisData[0].img = "#";
-      elementaisData[1].img = "#";
-      elementaisData[2].img = "#";
-      elementaisData[3].img = "#";
-      elementaisData[4].img = "#";
-      elementaisData[5].img = "#";
-      elementaisData[6].img = "#";
-      elementaisData[7].img = "#";
-      elementaisData[8].img = "#";
-      elementaisData[9].img = "#";
-      elementaisData[10].img = "#";
-      elementaisData[11].img = "#";
-      elementaisData[12].img = "#";
-      elementaisData[13].img = "#";
-      elementaisData[14].img = "#";
-      elementaisData[15].img = "#";
-      elementaisData[16].img = "#";
-      elementaisData[17].img = "#";
-      elementaisData[18].img = "#";
-      elementaisData[19].img = "#";
-      elementaisData[20].img = "#";
-      elementaisData[21].img = "#";
-      elementaisData[22].img = "#";
-      elementaisData[23].img = "#";
-      elementaisData[24].img = "#";
-      elementaisData[25].img = "#";
-      elementaisData[26].img = "#";
-      elementaisData[27].img = "#";
-      elementaisData[28].img = "#";
-      elementaisData[29].img = "#";
-      elementaisData[30].img = "#";
-      elementaisData[31].img = "#";
-      elementaisData[32].img = "#";
-      elementaisData[33].img = "#";
-      elementaisData[34].img = "#";
-      elementaisData[35].img = "#";
-      elementaisData[36].img = "#";
-      elementaisData[37].img = "#";
-      elementaisData[38].img = "#";
-      elementaisData[39].img = "#";
-      elementaisData[40].img = "#";
-      elementaisData[41].img = "#";
-      elementaisData[42].img = "#";
-      elementaisData[43].img = "#";
-      elementaisData[44].img = "#";
-      elementaisData[45].img = "#";
-      elementaisData[46].img = "#";
-      elementaisData[47].img = "#";
-      elementaisData[48].img = "#";
-      elementaisData[49].img = "#";
-      elementaisData[50].img = "#";
-      elementaisData[51].img = "#";
-      elementaisData[52].img = "#";
-      elementaisData[53].img = "#";
-      elementaisData[54].img = "#";
-      elementaisData[55].img = "#";
-      elementaisData[56].img = "#";
-      elementaisData[57].img = "#";
-      elementaisData[58].img = "#";
-      elementaisData[59].img = "#";
-      elementaisData[60].img = "#";
-      elementaisData[61].img = "#";
-      elementaisData[62].img = "#";
-      elementaisData[63].img = "#";
-
-            const imgPlaceholder = `
+      const isValidImg = item.img && item.img.trim() !== "" && item.img !== "#";
+      const imgPlaceholder = `
         <div class="w-full h-24 bg-slate-950/70 border border-slate-800 rounded-lg flex flex-col items-center justify-center text-slate-500 mb-2 overflow-hidden group-hover:border-slate-700">
           <span class="text-2xl mb-1">👾</span>
           <span class="text-[10px] uppercase font-mono tracking-wider">Sem Imagem</span>
         </div>
       `;
 
-      const imgElement = item.img && item.img.trim() !== "" 
+      const imgElement = isValidImg 
         ? `<img src="${item.img}" alt="${item.nome} ${item.versao}" class="w-full h-24 object-contain rounded-lg mb-2 p-1 bg-slate-950 border border-slate-800">`
         : imgPlaceholder;
 
@@ -182,38 +190,77 @@
             <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider ${item.badgeClass}">${item.versao}</span>
           </div>
           
-          ${imgElement}
+          <div class="relative">
+            <!-- Selo de Coroa Flutuante sobre a imagem -->
+            <div id="crown-badge-${item.id}" class="hidden absolute top-1 right-1 bg-amber-500/90 text-black px-1.5 py-0.5 rounded-md text-[10px] font-bold shadow-lg flex items-center gap-0.5 z-10">
+              👑 DOMINADO
+            </div>
+            ${imgElement}
+          </div>
 
           <h2 class="text-xs font-semibold text-slate-100 line-clamp-1 group-hover:text-white" title="${item.nome}">${item.nome}</h2>
         </div>
 
-        <div class="mt-3 flex items-center justify-between gap-2 pt-2 border-t border-slate-800/80">
-          <button type="button" onclick="event.stopPropagation(); showModal(${item.id})" class="text-slate-400 hover:text-cyan-400 p-1 rounded-md text-xs flex items-center gap-1 transition-colors" title="Ver Habilidade">
+        <div class="mt-3 flex items-center justify-between gap-1 pt-2 border-t border-slate-800/80">
+          <!-- Info de Habilidade -->
+          <button type="button" onclick="showModal(${item.id})" class="text-slate-400 hover:text-cyan-400 p-1 rounded-md text-xs flex items-center gap-1 transition-colors" title="Ver Habilidade">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path stroke-width="2" d="M12 16v-4m0-4h.01"/></svg>
             <span class="text-[10px] hidden sm:inline">Info</span>
           </button>
 
-          <div id="check-${item.id}" class="w-6 h-6 rounded-md border-2 border-slate-600 bg-slate-950 flex items-center justify-center text-transparent font-bold text-xs transition-all">
-            ✓
+          <div class="flex items-center gap-1.5">
+            <!-- Botão de Coroa (Dominar) -->
+            <button 
+              type="button" 
+              id="crown-btn-${item.id}" 
+              onclick="toggleCrown(${item.id})" 
+              title="Marcar como Dominado com Coroa"
+              class="w-7 h-7 rounded-md border border-slate-700 bg-slate-950 flex items-center justify-center text-xs text-slate-500 hover:text-amber-400 hover:border-amber-500/50 transition-all"
+            >
+              👑
+            </button>
+
+            <!-- Checkbox de Captura -->
+            <button 
+              type="button" 
+              id="check-${item.id}" 
+              onclick="toggleItem(${item.id})" 
+              title="Marcar como Obtido/Capturado"
+              class="w-7 h-7 rounded-md border-2 border-slate-600 bg-slate-950 flex items-center justify-center text-transparent font-bold text-xs transition-all hover:border-emerald-500"
+            >
+              ✓
+            </button>
           </div>
         </div>
       `;
 
-      card.onclick = () => toggleItem(item.id);
       grid.appendChild(card);
     });
 
-    // Função que aplica os filtros de visibilidade nos cards
+    // Utilitário para verificar status
+    function getItemStatus(id) {
+      const val = currentState[id];
+      if (typeof val === 'boolean') {
+        return { captured: val, crowned: false };
+      }
+      return {
+        captured: Boolean(val?.captured),
+        crowned: Boolean(val?.crowned)
+      };
+    }
+
+    // Aplica os filtros de visibilidade
     function applyFilters() {
       let visibleCount = 0;
 
       elementaisData.forEach(item => {
         const cardEl = document.getElementById(`card-${item.id}`);
-        const isChecked = Boolean(currentState[item.id]);
+        const status = getItemStatus(item.id);
 
         let matchesFilter = true;
-        if (currentFilter === 'checked') matchesFilter = isChecked;
-        if (currentFilter === 'missing') matchesFilter = !isChecked;
+        if (currentFilter === 'checked') matchesFilter = status.captured;
+        if (currentFilter === 'crowned') matchesFilter = status.crowned;
+        if (currentFilter === 'missing') matchesFilter = !status.captured;
 
         const matchesSearch = searchTerm === '' || 
           item.nome.toLowerCase().includes(searchTerm) || 
@@ -240,29 +287,50 @@
     onValue(itemsRef, (snapshot) => {
       currentState = snapshot.val() || {};
       let totalChecked = 0;
+      let totalCrowned = 0;
 
       elementaisData.forEach(item => {
         const checkEl = document.getElementById(`check-${item.id}`);
+        const crownBtn = document.getElementById(`crown-btn-${item.id}`);
+        const crownBadge = document.getElementById(`crown-badge-${item.id}`);
         const cardEl = document.getElementById(`card-${item.id}`);
-        const isChecked = Boolean(currentState[item.id]);
+        const status = getItemStatus(item.id);
 
-        if (isChecked) {
-          totalChecked++;
-          checkEl.className = "w-6 h-6 rounded-md bg-emerald-500 border-2 border-emerald-400 flex items-center justify-center text-slate-950 font-bold text-xs shadow-[0_0_10px_rgba(16,185,129,0.3)]";
+        if (status.captured) totalChecked++;
+        if (status.crowned) totalCrowned++;
+
+        // Render Checkbox de Captura
+        if (status.captured) {
+          checkEl.className = "w-7 h-7 rounded-md bg-emerald-500 border-2 border-emerald-400 flex items-center justify-center text-slate-950 font-bold text-xs shadow-[0_0_10px_rgba(16,185,129,0.3)]";
+          checkEl.textContent = "✓";
           cardEl.classList.add("bg-emerald-950/20", "border-emerald-500/50");
         } else {
-          checkEl.className = "w-6 h-6 rounded-md border-2 border-slate-700 bg-slate-950 flex items-center justify-center text-transparent text-xs";
+          checkEl.className = "w-7 h-7 rounded-md border-2 border-slate-700 bg-slate-950 flex items-center justify-center text-transparent text-xs hover:border-emerald-500";
+          checkEl.textContent = "✓";
           cardEl.classList.remove("bg-emerald-950/20", "border-emerald-500/50");
+        }
+
+        // Render Efeito de Coroa (Dominado)
+        if (status.crowned) {
+          crownBtn.className = "w-7 h-7 rounded-md bg-amber-500 border border-amber-400 flex items-center justify-center text-xs text-black font-bold shadow-[0_0_10px_rgba(245,158,11,0.5)]";
+          crownBadge.classList.remove("hidden");
+          cardEl.classList.add("card-crowned");
+        } else {
+          crownBtn.className = "w-7 h-7 rounded-md border border-slate-700 bg-slate-950 flex items-center justify-center text-xs text-slate-500 hover:text-amber-400 hover:border-amber-500/50 transition-all";
+          crownBadge.classList.add("hidden");
+          cardEl.classList.remove("card-crowned");
         }
       });
 
       const total = elementaisData.length;
       const totalMissing = total - totalChecked;
 
-      // Atualiza contadores globais e dos botões de filtro
+      // Atualiza contadores
       document.getElementById('counter').innerText = `${totalChecked} / ${total}`;
+      document.getElementById('crowned-counter').innerText = `${totalCrowned} Dominados`;
       document.getElementById('count-all').innerText = total;
       document.getElementById('count-checked').innerText = totalChecked;
+      document.getElementById('count-crowned').innerText = totalCrowned;
       document.getElementById('count-missing').innerText = totalMissing;
 
       const pct = Math.round((totalChecked / total) * 100);
@@ -272,25 +340,48 @@
       applyFilters();
     });
 
-    // Funções de Controle expostas ao escopo global
+    // Funções de Controle no Firebase
     window.toggleItem = (id) => {
-      const current = Boolean(currentState[id]);
-      set(ref(db, `elementais_status/${id}`), !current);
+      const status = getItemStatus(id);
+      const newCaptured = !status.captured;
+      // Se desmarcar como capturado, retira a coroa automaticamente
+      const newCrowned = newCaptured ? status.crowned : false;
+      
+      set(ref(db, `elementais_status/${id}`), {
+        captured: newCaptured,
+        crowned: newCrowned
+      });
+    };
+
+    window.toggleCrown = (id) => {
+      const status = getItemStatus(id);
+      const newCrowned = !status.crowned;
+      // Se ativar coroa, marca automaticamente como capturado
+      const newCaptured = newCrowned ? true : status.captured;
+
+      set(ref(db, `elementais_status/${id}`), {
+        captured: newCaptured,
+        crowned: newCrowned
+      });
     };
 
     window.setFilter = (filterType) => {
       currentFilter = filterType;
       
-      // Atualiza botões
       const buttons = {
         'all': document.getElementById('btn-all'),
         'checked': document.getElementById('btn-checked'),
+        'crowned': document.getElementById('btn-crowned'),
         'missing': document.getElementById('btn-missing')
       };
 
       Object.keys(buttons).forEach(type => {
         if (type === filterType) {
-          buttons[type].className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500 text-slate-950 shadow-md flex items-center gap-1.5 transition-all";
+          if (type === 'crowned') {
+            buttons[type].className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-500 text-slate-950 shadow-md flex items-center gap-1.5 transition-all";
+          } else {
+            buttons[type].className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500 text-slate-950 shadow-md flex items-center gap-1.5 transition-all";
+          }
         } else {
           buttons[type].className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-750 hover:text-white flex items-center gap-1.5 transition-all";
         }
@@ -332,14 +423,18 @@
         <h1 class="text-2xl sm:text-3xl font-bold font-gaming text-white tracking-wide">
           ESPÍRITOS ELEMENTAIS // <span class="text-cyan-400">FORTNITE</span>
         </h1>
-        <p class="text-sm text-slate-400 mt-1">Checklist compartilhado para o esquadrão.</p>
+        <p class="text-sm text-slate-400 mt-1">Checklist com Captura e Domínio de Coroa (👑) em tempo real.</p>
       </div>
 
       <!-- Barra de Progresso Global -->
-      <div class="w-full md:w-64 bg-slate-950 p-4 rounded-xl border border-slate-800">
+      <div class="w-full md:w-72 bg-slate-950 p-4 rounded-xl border border-slate-800">
         <div class="flex justify-between items-center text-xs font-mono mb-2">
           <span class="text-slate-400">Coletados</span>
-          <span id="counter" class="text-emerald-400 font-bold">0 / 64</span>
+          <div class="flex items-center gap-2">
+            <span id="crowned-counter" class="text-amber-400 font-bold text-[11px]">0 Dominados</span>
+            <span class="text-slate-600">|</span>
+            <span id="counter" class="text-emerald-400 font-bold">0 / 64</span>
+          </div>
         </div>
         <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
           <div id="progress-bar" class="bg-emerald-400 h-full w-0 transition-all duration-300"></div>
@@ -351,7 +446,7 @@
     <!-- Barra de Filtros e Busca -->
     <div class="mb-6 flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-900/40 p-3 rounded-xl border border-slate-800/80">
       
-      <!-- Botões de Status (Todos / Obtidos / Faltando) -->
+      <!-- Botões de Status (Todos / Obtidos / Dominados / Faltando) -->
       <div class="flex items-center gap-2 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
         <button id="btn-all" onclick="setFilter('all')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500 text-slate-950 shadow-md flex items-center gap-1.5 transition-all">
           <span>Todos</span>
@@ -362,6 +457,12 @@
           <span class="text-emerald-400">✓</span>
           <span>Obtidos</span>
           <span id="count-checked" class="bg-slate-950/60 text-emerald-400 px-1.5 py-0.2 rounded text-[10px] font-mono">0</span>
+        </button>
+
+        <button id="btn-crowned" onclick="setFilter('crowned')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-750 hover:text-white flex items-center gap-1.5 transition-all">
+          <span>👑</span>
+          <span>Dominados</span>
+          <span id="count-crowned" class="bg-slate-950/60 text-amber-400 px-1.5 py-0.2 rounded text-[10px] font-mono">0</span>
         </button>
 
         <button id="btn-missing" onclick="setFilter('missing')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-750 hover:text-white flex items-center gap-1.5 transition-all">
