@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rastreador de Elementais - Fortnite</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .font-gaming { font-family: 'Chakra Petch', sans-serif; }
+    
+    /* Cores das variações */
+    .badge-normal { background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.4); }
+    .badge-dourado { background: rgba(234, 179, 8, 0.2); color: #fde047; border: 1px solid rgba(234, 179, 8, 0.4); }
+    .badge-trapaca { background: rgba(168, 85, 247, 0.2); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.4); }
+    .badge-mitico { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); }
+  </style>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAruvFG2YHwaEesq-izCzDBfNvmX9F-uC0",
+      authDomain: "elementais-2f4f4.firebaseapp.com",
+      databaseURL: "https://elementais-2f4f4-default-rtdb.firebaseio.com",
+      projectId: "elementais-2f4f4",
+      storageBucket: "elementais-2f4f4.firebasestorage.app",
+      messagingSenderId: "260143831871",
+      appId: "1:260143831871:web:e507a21261f6e55ae1918a",
+      measurementId: "G-2BJ6QHVHGT"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const itemsRef = ref(db, 'elementais_status');
+
+    // 16 Elementais base com descrições
+    const baseElementais = [
+      { nome: "Elemental Aventura", desc: "Melhora aleatoriamente a raridade de um item do inventário a cada nível ganho." },
+      { nome: "Elemental Guarda da Moita", desc: "Cria um arbusto ao seu redor periodicamente; gera uma moita ao ser eliminado no nível máximo." },
+      { nome: "Elemental Jonesy", desc: "Restaura parte de sua vida ou escudo logo após você receber dano de oponentes." },
+      { nome: "Elemental Sonic", desc: "Concede bônus de velocidade e aceleração ao jogador." },
+      { nome: "Elemental Tails", desc: "Permite planar e ganhar mobilidade vertical avançada." },
+      { nome: "Elemental Klimbo", desc: "Pequena criatura baseada no clássico dinossauro do jogo." },
+      { nome: "Elemental Jackrabbit", desc: "Focado em agilidade e saltos." },
+      { nome: "Elemental 8-Bits", desc: "Estética retrô pixelada." },
+      { nome: "Elemental Shadow", desc: "Concede camuflagem e bônus de movimentação furtiva." },
+      { nome: "Elemental Coroa (Crown)", desc: "Relacionado a bônus de vitórias consecutivas." },
+      { nome: "Elemental Disruptor", desc: "Interfere com aparelhos e radares inimigos." },
+      { nome: "Elemental Raio X", desc: "Marca inimigos periodicamente em uma área ao seu redor (o raio e a frequência aumentam a cada nível)." },
+      { nome: "Elemental Onigiri", desc: "Aplica o efeito Sobrecarga após consumir qualquer item de cura ou escudo." },
+      { nome: "Elemental Mega Man", desc: "Reduz o atrito ao deslizar, permitindo que você deslize muito mais longe." },
+      { nome: "Elemental Sobreescudo", desc: "Concede e regenera uma camada extra de Sobrescudo para o jogador." },
+      { nome: "Elemental Cavaleiro (Knight)", desc: "Nova criatura focada em defesa adicionada ao ecossistema." }
+    ];
+
+    const tipos = [
+      { tipo: "Normal", badgeClass: "badge-normal" },
+      { tipo: "Dourado", badgeClass: "badge-dourado" },
+      { tipo: "Trapaça", badgeClass: "badge-trapaca" },
+      { tipo: "Mítico", badgeClass: "badge-mitico" }
+    ];
+
+    // Montagem dos 64 itens sequenciais
+    const elementaisData = [];
+    let counter = 1;
+
+    baseElementais.forEach((el) => {
+      tipos.forEach((t) => {
+        elementaisData.push({
+          id: counter,
+          nome: el.nome,
+          descricao: el.desc,
+          versao: t.tipo,
+          badgeClass: t.badgeClass,
+          img: "" // Exemplo: "imagens/1.png" ou URL web
+        });
+        counter++;
+      });
+    });
+
+    // Variáveis de controle de filtro
+    let currentFilter = 'all'; // 'all', 'checked', 'missing'
+    let searchTerm = '';
+    let currentState = {};
+
+    const grid = document.getElementById('grid');
+
+    // Renderiza a interface inicial
+    elementaisData.forEach(item => {
+      const card = document.createElement('div');
+      card.id = `card-${item.id}`;
+      card.className = "relative flex flex-col justify-between p-3 rounded-xl border border-slate-800 bg-slate-900/90 hover:border-slate-600 transition-all cursor-pointer select-none group";
+
+    // Exemplo: definindo a imagem do Elemental Aventura Normal (#1) e Dourado (#2) inserção de imagem
+      elementaisData[0].img = "#";
+      elementaisData[1].img = "#";
+      elementaisData[2].img = "#";
+      elementaisData[3].img = "#";
+      elementaisData[4].img = "#";
+      elementaisData[5].img = "#";
+      elementaisData[6].img = "#";
+      elementaisData[7].img = "#";
+      elementaisData[8].img = "#";
+      elementaisData[9].img = "#";
+      elementaisData[10].img = "#";
+      elementaisData[11].img = "#";
+      elementaisData[12].img = "#";
+      elementaisData[13].img = "#";
+      elementaisData[14].img = "#";
+      elementaisData[15].img = "#";
+      elementaisData[16].img = "#";
+      elementaisData[17].img = "#";
+      elementaisData[18].img = "#";
+      elementaisData[19].img = "#";
+      elementaisData[20].img = "#";
+      elementaisData[21].img = "#";
+      elementaisData[22].img = "#";
+      elementaisData[23].img = "#";
+      elementaisData[24].img = "#";
+      elementaisData[25].img = "#";
+      elementaisData[26].img = "#";
+      elementaisData[27].img = "#";
+      elementaisData[28].img = "#";
+      elementaisData[29].img = "#";
+      elementaisData[30].img = "#";
+      elementaisData[31].img = "#";
+      elementaisData[32].img = "#";
+      elementaisData[33].img = "#";
+      elementaisData[34].img = "#";
+      elementaisData[35].img = "#";
+      elementaisData[36].img = "#";
+      elementaisData[37].img = "#";
+      elementaisData[38].img = "#";
+      elementaisData[39].img = "#";
+      elementaisData[40].img = "#";
+      elementaisData[41].img = "#";
+      elementaisData[42].img = "#";
+      elementaisData[43].img = "#";
+      elementaisData[44].img = "#";
+      elementaisData[45].img = "#";
+      elementaisData[46].img = "#";
+      elementaisData[47].img = "#";
+      elementaisData[48].img = "#";
+      elementaisData[49].img = "#";
+      elementaisData[50].img = "#";
+      elementaisData[51].img = "#";
+      elementaisData[52].img = "#";
+      elementaisData[53].img = "#";
+      elementaisData[54].img = "#";
+      elementaisData[55].img = "#";
+      elementaisData[56].img = "#";
+      elementaisData[57].img = "#";
+      elementaisData[58].img = "#";
+      elementaisData[59].img = "#";
+      elementaisData[60].img = "#";
+      elementaisData[61].img = "#";
+      elementaisData[62].img = "#";
+      elementaisData[63].img = "#";
+
+            const imgPlaceholder = `
+        <div class="w-full h-24 bg-slate-950/70 border border-slate-800 rounded-lg flex flex-col items-center justify-center text-slate-500 mb-2 overflow-hidden group-hover:border-slate-700">
+          <span class="text-2xl mb-1">👾</span>
+          <span class="text-[10px] uppercase font-mono tracking-wider">Sem Imagem</span>
+        </div>
+      `;
+
+      const imgElement = item.img && item.img.trim() !== "" 
+        ? `<img src="${item.img}" alt="${item.nome} ${item.versao}" class="w-full h-24 object-contain rounded-lg mb-2 p-1 bg-slate-950 border border-slate-800">`
+        : imgPlaceholder;
+
+      card.innerHTML = `
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-xs font-mono font-bold text-slate-400">#${item.id}</span>
+            <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider ${item.badgeClass}">${item.versao}</span>
+          </div>
+          
+          ${imgElement}
+
+          <h2 class="text-xs font-semibold text-slate-100 line-clamp-1 group-hover:text-white" title="${item.nome}">${item.nome}</h2>
+        </div>
+
+        <div class="mt-3 flex items-center justify-between gap-2 pt-2 border-t border-slate-800/80">
+          <button type="button" onclick="event.stopPropagation(); showModal(${item.id})" class="text-slate-400 hover:text-cyan-400 p-1 rounded-md text-xs flex items-center gap-1 transition-colors" title="Ver Habilidade">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path stroke-width="2" d="M12 16v-4m0-4h.01"/></svg>
+            <span class="text-[10px] hidden sm:inline">Info</span>
+          </button>
+
+          <div id="check-${item.id}" class="w-6 h-6 rounded-md border-2 border-slate-600 bg-slate-950 flex items-center justify-center text-transparent font-bold text-xs transition-all">
+            ✓
+          </div>
+        </div>
+      `;
+
+      card.onclick = () => toggleItem(item.id);
+      grid.appendChild(card);
+    });
+
+    // Função que aplica os filtros de visibilidade nos cards
+    function applyFilters() {
+      let visibleCount = 0;
+
+      elementaisData.forEach(item => {
+        const cardEl = document.getElementById(`card-${item.id}`);
+        const isChecked = Boolean(currentState[item.id]);
+
+        let matchesFilter = true;
+        if (currentFilter === 'checked') matchesFilter = isChecked;
+        if (currentFilter === 'missing') matchesFilter = !isChecked;
+
+        const matchesSearch = searchTerm === '' || 
+          item.nome.toLowerCase().includes(searchTerm) || 
+          item.versao.toLowerCase().includes(searchTerm) || 
+          item.id.toString() === searchTerm;
+
+        if (matchesFilter && matchesSearch) {
+          cardEl.classList.remove('hidden');
+          visibleCount++;
+        } else {
+          cardEl.classList.add('hidden');
+        }
+      });
+
+      const emptyMsg = document.getElementById('empty-msg');
+      if (visibleCount === 0) {
+        emptyMsg.classList.remove('hidden');
+      } else {
+        emptyMsg.classList.add('hidden');
+      }
+    }
+
+    // Atualização em tempo real via Firebase
+    onValue(itemsRef, (snapshot) => {
+      currentState = snapshot.val() || {};
+      let totalChecked = 0;
+
+      elementaisData.forEach(item => {
+        const checkEl = document.getElementById(`check-${item.id}`);
+        const cardEl = document.getElementById(`card-${item.id}`);
+        const isChecked = Boolean(currentState[item.id]);
+
+        if (isChecked) {
+          totalChecked++;
+          checkEl.className = "w-6 h-6 rounded-md bg-emerald-500 border-2 border-emerald-400 flex items-center justify-center text-slate-950 font-bold text-xs shadow-[0_0_10px_rgba(16,185,129,0.3)]";
+          cardEl.classList.add("bg-emerald-950/20", "border-emerald-500/50");
+        } else {
+          checkEl.className = "w-6 h-6 rounded-md border-2 border-slate-700 bg-slate-950 flex items-center justify-center text-transparent text-xs";
+          cardEl.classList.remove("bg-emerald-950/20", "border-emerald-500/50");
+        }
+      });
+
+      const total = elementaisData.length;
+      const totalMissing = total - totalChecked;
+
+      // Atualiza contadores globais e dos botões de filtro
+      document.getElementById('counter').innerText = `${totalChecked} / ${total}`;
+      document.getElementById('count-all').innerText = total;
+      document.getElementById('count-checked').innerText = totalChecked;
+      document.getElementById('count-missing').innerText = totalMissing;
+
+      const pct = Math.round((totalChecked / total) * 100);
+      document.getElementById('progress-bar').style.width = `${pct}%`;
+      document.getElementById('progress-pct').innerText = `${pct}%`;
+
+      applyFilters();
+    });
+
+    // Funções de Controle expostas ao escopo global
+    window.toggleItem = (id) => {
+      const current = Boolean(currentState[id]);
+      set(ref(db, `elementais_status/${id}`), !current);
+    };
+
+    window.setFilter = (filterType) => {
+      currentFilter = filterType;
+      
+      // Atualiza botões
+      const buttons = {
+        'all': document.getElementById('btn-all'),
+        'checked': document.getElementById('btn-checked'),
+        'missing': document.getElementById('btn-missing')
+      };
+
+      Object.keys(buttons).forEach(type => {
+        if (type === filterType) {
+          buttons[type].className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500 text-slate-950 shadow-md flex items-center gap-1.5 transition-all";
+        } else {
+          buttons[type].className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-750 hover:text-white flex items-center gap-1.5 transition-all";
+        }
+      });
+
+      applyFilters();
+    };
+
+    window.filterSearch = (val) => {
+      searchTerm = val.trim().toLowerCase();
+      applyFilters();
+    };
+
+    window.showModal = (id) => {
+      const item = elementaisData.find(x => x.id === id);
+      if (!item) return;
+      document.getElementById('modal-title').innerText = `${item.nome} (#${item.id})`;
+      document.getElementById('modal-version').innerText = item.versao;
+      document.getElementById('modal-version').className = `text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase ${item.badgeClass}`;
+      document.getElementById('modal-desc').innerText = item.descricao;
+      document.getElementById('info-modal').classList.remove('hidden');
+    };
+
+    window.closeModal = () => {
+      document.getElementById('info-modal').classList.add('hidden');
+    };
+  </script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen p-4 sm:p-8 font-sans selection:bg-cyan-500 selection:text-black">
+  <div class="max-w-7xl mx-auto">
+    
+    <!-- Top Header / Dashboard -->
+    <header class="mb-6 p-6 rounded-2xl bg-slate-900/60 border border-slate-800 backdrop-blur-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+      <div>
+        <div class="flex items-center gap-2 mb-1">
+          <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="text-xs font-mono uppercase tracking-widest text-slate-400">Sincronização ao Vivo</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-bold font-gaming text-white tracking-wide">
+          ESPÍRITOS ELEMENTAIS // <span class="text-cyan-400">FORTNITE</span>
+        </h1>
+        <p class="text-sm text-slate-400 mt-1">Checklist compartilhado para o esquadrão.</p>
+      </div>
+
+      <!-- Barra de Progresso Global -->
+      <div class="w-full md:w-64 bg-slate-950 p-4 rounded-xl border border-slate-800">
+        <div class="flex justify-between items-center text-xs font-mono mb-2">
+          <span class="text-slate-400">Coletados</span>
+          <span id="counter" class="text-emerald-400 font-bold">0 / 64</span>
+        </div>
+        <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+          <div id="progress-bar" class="bg-emerald-400 h-full w-0 transition-all duration-300"></div>
+        </div>
+        <div class="text-right text-[11px] font-mono text-slate-500 mt-1" id="progress-pct">0%</div>
+      </div>
+    </header>
+
+    <!-- Barra de Filtros e Busca -->
+    <div class="mb-6 flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-900/40 p-3 rounded-xl border border-slate-800/80">
+      
+      <!-- Botões de Status (Todos / Obtidos / Faltando) -->
+      <div class="flex items-center gap-2 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
+        <button id="btn-all" onclick="setFilter('all')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500 text-slate-950 shadow-md flex items-center gap-1.5 transition-all">
+          <span>Todos</span>
+          <span id="count-all" class="bg-black/20 px-1.5 py-0.2 rounded text-[10px] font-mono">64</span>
+        </button>
+
+        <button id="btn-checked" onclick="setFilter('checked')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-750 hover:text-white flex items-center gap-1.5 transition-all">
+          <span class="text-emerald-400">✓</span>
+          <span>Obtidos</span>
+          <span id="count-checked" class="bg-slate-950/60 text-emerald-400 px-1.5 py-0.2 rounded text-[10px] font-mono">0</span>
+        </button>
+
+        <button id="btn-missing" onclick="setFilter('missing')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-750 hover:text-white flex items-center gap-1.5 transition-all">
+          <span class="text-amber-400">⏳</span>
+          <span>Faltando</span>
+          <span id="count-missing" class="bg-slate-950/60 text-amber-400 px-1.5 py-0.2 rounded text-[10px] font-mono">64</span>
+        </button>
+      </div>
+
+      <!-- Campo de Pesquisa -->
+      <div class="relative w-full sm:w-64">
+        <input 
+          type="text" 
+          placeholder="Buscar elemental ou #ID..." 
+          oninput="filterSearch(this.value)"
+          class="w-full bg-slate-950 border border-slate-800 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors"
+        >
+        <span class="absolute left-2.5 top-2 text-slate-500 text-xs">🔍</span>
+      </div>
+    </div>
+
+    <!-- Mensagem de lista vazia após filtro -->
+    <div id="empty-msg" class="hidden text-center py-16 text-slate-500 bg-slate-900/20 rounded-2xl border border-dashed border-slate-800">
+      <p class="text-sm">Nenhum elemental corresponde aos filtros aplicados.</p>
+    </div>
+
+    <!-- Grid dos 64 Elementais -->
+    <main id="grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3">
+      <!-- Inserido dinamicamente pelo script -->
+    </main>
+
+  </div>
+
+  <!-- Modal de Descrição e Habilidade -->
+  <div id="info-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4" onclick="closeModal()">
+    <div class="bg-slate-900 border border-slate-700 max-w-md w-full rounded-2xl p-6 shadow-2xl relative" onclick="event.stopPropagation()">
+      <div class="flex items-start justify-between gap-3 mb-3">
+        <div>
+          <h3 id="modal-title" class="text-lg font-bold text-white font-gaming"></h3>
+          <span id="modal-version"></span>
+        </div>
+        <button onclick="closeModal()" class="text-slate-400 hover:text-white text-lg font-mono leading-none">&times;</button>
+      </div>
+      <p class="text-xs text-slate-400 font-mono uppercase tracking-wider mb-2">Efeito & Habilidade:</p>
+      <p id="modal-desc" class="text-sm text-slate-200 leading-relaxed bg-slate-950/60 p-3 rounded-lg border border-slate-800"></p>
+      <div class="mt-5 text-right">
+        <button onclick="closeModal()" class="px-4 py-2 text-xs font-bold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 uppercase tracking-wider">Fechar</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
