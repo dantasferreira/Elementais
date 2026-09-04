@@ -47,6 +47,14 @@
     const db = getDatabase(app);
     const itemsRef = ref(db, 'elementais_status');
 
+    // Exemplo: ocultar os itens #4, #7 e #8
+const itensOcultos = [53, 54, 55]; 
+
+itensOcultos.forEach(id => {
+  const item = elementaisData.find(x => x.id === id);
+  if (item) item.hidden = true;
+});
+
     // 16 Elementais base com descrições
     const baseElementais = [
       { nome: "Elemental Aventura", desc: "Melhora aleatoriamente a raridade de um item do inventário a cada nível ganho." },
@@ -250,6 +258,12 @@
     // Aplica os filtros de visibilidade
     function applyFilters() {
       let visibleCount = 0;
+
+      // Se o item estiver marcado como hidden, ele nunca aparece na tela nem entra na contagem
+if (item.hidden) {
+  cardEl.classList.add('hidden');
+  return; 
+}
 
       elementaisData.forEach(item => {
         const cardEl = document.getElementById(`card-${item.id}`);
