@@ -46,14 +46,13 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
     const itemsRef = ref(db, 'elementais_status');
-
+});
     // Exemplo: ocultar os itens #4, #7 e #8
 const itensOcultos = [53, 54, 55]; 
 
 itensOcultos.forEach(id => {
   const item = elementaisData.find(x => x.id === id);
   if (item) item.hidden = true;
-});
 
     // 16 Elementais base com descrições
     const baseElementais = [
