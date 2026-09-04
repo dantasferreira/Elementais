@@ -93,13 +93,6 @@
       });
     });
 
-    // Exemplo: ocultar os itens #4, #7 e #8
-const itensOcultos = [53, 54, 55]; 
-
-itensOcultos.forEach(id => {
-  const item = elementaisData.find(x => x.id === id);
-  if (item) item.hidden = true;
-
     // Mapeamento de Imagens
     elementaisData[0].img = "img/Elemental-Aventura-Normal.jpeg";
     elementaisData[1].img = "img/Elemental-Aventura-Dourado.jpeg";
@@ -278,11 +271,6 @@ itensOcultos.forEach(id => {
         } else {
           cardEl.classList.add('hidden');
         }
-        // Se o item estiver marcado como hidden, ele nunca aparece na tela nem entra na contagem
-if (item.hidden) {
-  cardEl.classList.add('hidden');
-  return; 
-}
       });
 
       const emptyMsg = document.getElementById('empty-msg');
