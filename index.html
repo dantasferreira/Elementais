@@ -47,6 +47,13 @@
     const db = getDatabase(app);
     const itemsRef = ref(db, 'elementais_status');
 
+    // =========================================================================
+    // ⚙️ CONFIGURAÇÃO DE OCULTAÇÃO / REMOÇÃO:
+    // Adicione aqui dentro os IDs dos elementais que deseja deixar OCULTOS.
+    // Exemplo: [4, 8, 12] oculta o Mítico de cada um deles.
+    // =========================================================================
+    const IDS_OCULTOS = [53,54,55];
+
     // 16 Elementais base com descrições
     const baseElementais = [
       { nome: "Elemental Aventura", desc: "Melhora aleatoriamente a raridade de um item do inventário a cada nível ganho." },
@@ -87,7 +94,8 @@
           descricao: el.desc,
           versao: t.tipo,
           badgeClass: t.badgeClass,
-          img: "" 
+          img: "",
+          hidden: IDS_OCULTOS.includes(counter) //Marca se está oculto
         });
         counter++;
       });
@@ -168,6 +176,11 @@
       const card = document.createElement('div');
       card.id = `card-${item.id}`;
       card.className = "relative flex flex-col justify-between p-3 rounded-xl border border-slate-800 bg-slate-900/90 hover:border-slate-600 transition-all select-none group";
+
+      // Se estiver oculto por padrão, não exibe
+      if (item.hidden) {
+        card.classList.add('hidden');
+      }
 
       const isValidImg = item.img && item.img.trim() !== "" && item.img !== "#";
       const imgPlaceholder = `
@@ -253,6 +266,12 @@
 
       elementaisData.forEach(item => {
         const cardEl = document.getElementById(`card-${item.id}`);
+        
+        //Se estiver na lista de ocultos, nunca renderiza
+        if (item.hidden) {
+          cardEl.classList.add('hidden');
+        }
+
         const status = getItemStatus(item.id);
 
         let matchesFilter = true;
@@ -286,6 +305,9 @@
       currentState = snapshot.val() || {};
       let totalChecked = 0;
       let totalCrowned = 0;
+
+      //Filtra apenas os itens ativos (não ocultos) para cálculo
+      const activeItems = elementaisData.filter(x => !x.hidden);
 
       elementaisData.forEach(item => {
         const checkEl = document.getElementById(`check-${item.id}`);
@@ -331,7 +353,7 @@
       document.getElementById('count-crowned').innerText = totalCrowned;
       document.getElementById('count-missing').innerText = totalMissing;
 
-      const pct = Math.round((totalChecked / total) * 100);
+      const pct = toal > 0 ? Math.round((totalChecked / total) * 100) : 0;
       document.getElementById('progress-bar').style.width = `${pct}%`;
       document.getElementById('progress-pct').innerText = `${pct}%`;
 
@@ -421,7 +443,7 @@
         <h1 class="text-2xl sm:text-3xl font-bold font-gaming text-white tracking-wide">
           ESPÍRITOS ELEMENTAIS // <span class="text-cyan-400">FORTNITE</span>
         </h1>
-        <p class="text-sm text-slate-400 mt-1">Checklist com Captura e Domínio de Coroa (👑) em tempo real.</p>
+        <p class="text-sm text-slate-400 mt-1">Checklist coletivo personalizável em tempo real.</p>
       </div>
 
       <!-- Barra de Progresso Global -->
@@ -442,8 +464,7 @@
     </header>
 
     <!-- Barra de Filtros e Busca -->
-    <div class="mb-6 flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-900/40 p-3 rounded-xl border border-slate-800/80">
-      
+    <div class="mb-6 flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-900/40 p-3 rounded-xl border border-slate-800/80">      
       <!-- Botões de Status (Todos / Obtidos / Dominados / Faltando) -->
       <div class="flex items-center gap-2 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
         <button id="btn-all" onclick="setFilter('all')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500 text-slate-950 shadow-md flex items-center gap-1.5 transition-all">
