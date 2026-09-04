@@ -353,7 +353,7 @@
       document.getElementById('count-crowned').innerText = totalCrowned;
       document.getElementById('count-missing').innerText = totalMissing;
 
-      const pct = toal > 0 ? Math.round((totalChecked / total) * 100) : 0;
+      const pct = Math.round((totalChecked / total) * 100);
       document.getElementById('progress-bar').style.width = `${pct}%`;
       document.getElementById('progress-pct').innerText = `${pct}%`;
 
