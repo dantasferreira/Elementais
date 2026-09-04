@@ -319,6 +319,7 @@
         if (status.captured) totalChecked++;
         if (status.crowned) totalCrowned++;
 
+        // Render Check de Captura
         if (status.captured) {
           checkEl.className = "w-7 h-7 rounded-md bg-emerald-500 border-2 border-emerald-400 flex items-center justify-center text-slate-950 font-bold text-xs shadow-[0_0_10px_rgba(16,185,129,0.3)]";
           checkEl.textContent = "✓";
@@ -329,6 +330,7 @@
           cardEl.classList.remove("bg-emerald-950/20", "border-emerald-500/50");
         }
 
+        // Render Efeito de Coroa (Dominado)
         if (status.crowned) {
           crownBtn.className = "w-7 h-7 rounded-md bg-amber-500 border border-amber-400 flex items-center justify-center text-xs text-black font-bold shadow-[0_0_10px_rgba(245,158,11,0.5)]";
           crownBadge.classList.remove("hidden");
@@ -343,6 +345,7 @@
       const total = activeItems.length;
       const totalMissing = total - totalChecked;
 
+      // Atualiza contadores
       document.getElementById('counter').innerText = `${totalChecked} / ${total}`;
       document.getElementById('crowned-counter').innerText = `${totalCrowned} Dominados`;
       document.getElementById('count-all').innerText = total;
@@ -357,9 +360,11 @@
       applyFilters();
     });
 
+    // Funções de Controle no Firebase
     window.toggleItem = (id) => {
       const status = getItemStatus(id);
       const newCaptured = !status.captured;
+      // Se desmarcar como capturado, retira a coroa automaticamente
       const newCrowned = newCaptured ? status.crowned : false;
       
       set(ref(db, `elementais_status/${id}`), {
@@ -371,6 +376,7 @@
     window.toggleCrown = (id) => {
       const status = getItemStatus(id);
       const newCrowned = !status.crowned;
+      // Se ativar coroa, marca automaticamente como capturado
       const newCaptured = newCrowned ? true : status.captured;
 
       set(ref(db, `elementais_status/${id}`), {
@@ -484,6 +490,7 @@
         </button>
       </div>
 
+      <!-- Campo de Pesquisa -->
       <div class="relative w-full sm:w-64">
         <input 
           type="text" 
