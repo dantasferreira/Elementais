@@ -52,7 +52,7 @@
     // Adicione aqui dentro os IDs dos elementais que deseja deixar OCULTOS.
     // Exemplo: [4, 8, 12] oculta o Mítico de cada um deles.
     // =========================================================================
-    const IDS_OCULTOS = [54,55,56];
+    const IDS_OCULTOS = [54,55,56]; 
 
     // 16 Elementais base com descrições
     const baseElementais = [
@@ -71,8 +71,7 @@
       { nome: "Elemental Onigiri", desc: "Aplica o efeito Sobrecarga após consumir qualquer item de cura ou escudo." },
       { nome: "Elemental Mega Man", desc: "Reduz o atrito ao deslizar, permitindo que você deslize muito mais longe." },
       { nome: "Elemental Sobreescudo", desc: "Concede e regenera uma camada extra de Sobrescudo para o jogador." },
-      /*{ nome: "Elemental Cavaleiro (Knight)", desc: "Nova criatura focada em defesa adicionada ao ecossistema." },*/
-      { nome: "Elemental Storm Scout", desc: "Nova criatura da tempestade." }
+      { nome: "Elemental Storm Scout", desc: "Nova criatura da Tempestade." }
     ];
 
     const tipos = [
@@ -82,7 +81,7 @@
       { tipo: "Mítico", badgeClass: "badge-mitico" }
     ];
 
-    // Montagem dos 64 itens sequenciais
+    // Montagem dos itens
     const elementaisData = [];
     let counter = 1;
 
@@ -95,13 +94,13 @@
           versao: t.tipo,
           badgeClass: t.badgeClass,
           img: "",
-          hidden: IDS_OCULTOS.includes(counter) //Marca se está oculto
+          hidden: IDS_OCULTOS.includes(counter) // Marca se está oculto
         });
         counter++;
       });
     });
 
-    // Mapeamento de Imagens
+    // Mapeamento das imagens
     elementaisData[0].img = "img/Elemental-Aventura-Normal.jpeg";
     elementaisData[1].img = "img/Elemental-Aventura-Dourado.jpeg";
     elementaisData[2].img = "img/Elemental-Aventura-Trapaça.jpeg";
@@ -202,7 +201,7 @@
           </div>
           
           <div class="relative">
-            <!-- Selo de Coroa Flutuante sobre a imagem -->
+            <!--Selo de Coroa Flutuante sobre a imagem -->
             <div id="crown-badge-${item.id}" class="hidden absolute top-1 right-1 bg-amber-500/90 text-black px-1.5 py-0.5 rounded-md text-[10px] font-bold shadow-lg flex items-center gap-0.5 z-10">
               👑 DOMINADO
             </div>
@@ -267,9 +266,10 @@
       elementaisData.forEach(item => {
         const cardEl = document.getElementById(`card-${item.id}`);
         
-        //Se estiver na lista de ocultos, nunca renderiza
+        // Se estiver na lista de ocultos, nunca renderiza
         if (item.hidden) {
           cardEl.classList.add('hidden');
+          return;
         }
 
         const status = getItemStatus(item.id);
@@ -278,7 +278,7 @@
         if (currentFilter === 'checked') matchesFilter = status.captured;
         if (currentFilter === 'crowned') matchesFilter = status.crowned;
         if (currentFilter === 'missing') matchesFilter = !status.captured;
-        
+
         const matchesSearch = searchTerm === '' || 
           item.nome.toLowerCase().includes(searchTerm) || 
           item.versao.toLowerCase().includes(searchTerm) || 
@@ -306,10 +306,10 @@
       let totalChecked = 0;
       let totalCrowned = 0;
 
-      //Filtra apenas os itens ativos (não ocultos) para cálculo
+      // Filtra apenas os itens ativos (não ocultos) para cálculo
       const activeItems = elementaisData.filter(x => !x.hidden);
 
-      elementaisData.forEach(item => {
+      activeItems.forEach(item => {
         const checkEl = document.getElementById(`check-${item.id}`);
         const crownBtn = document.getElementById(`crown-btn-${item.id}`);
         const crownBadge = document.getElementById(`crown-badge-${item.id}`);
@@ -319,7 +319,6 @@
         if (status.captured) totalChecked++;
         if (status.crowned) totalCrowned++;
 
-        // Render Checkbox de Captura
         if (status.captured) {
           checkEl.className = "w-7 h-7 rounded-md bg-emerald-500 border-2 border-emerald-400 flex items-center justify-center text-slate-950 font-bold text-xs shadow-[0_0_10px_rgba(16,185,129,0.3)]";
           checkEl.textContent = "✓";
@@ -330,7 +329,6 @@
           cardEl.classList.remove("bg-emerald-950/20", "border-emerald-500/50");
         }
 
-        // Render Efeito de Coroa (Dominado)
         if (status.crowned) {
           crownBtn.className = "w-7 h-7 rounded-md bg-amber-500 border border-amber-400 flex items-center justify-center text-xs text-black font-bold shadow-[0_0_10px_rgba(245,158,11,0.5)]";
           crownBadge.classList.remove("hidden");
@@ -342,10 +340,9 @@
         }
       });
 
-      const total = elementaisData.length;
+      const total = activeItems.length;
       const totalMissing = total - totalChecked;
 
-      // Atualiza contadores
       document.getElementById('counter').innerText = `${totalChecked} / ${total}`;
       document.getElementById('crowned-counter').innerText = `${totalCrowned} Dominados`;
       document.getElementById('count-all').innerText = total;
@@ -353,18 +350,16 @@
       document.getElementById('count-crowned').innerText = totalCrowned;
       document.getElementById('count-missing').innerText = totalMissing;
 
-      const pct = Math.round((totalChecked / total) * 100);
+      const pct = total > 0 ? Math.round((totalChecked / total) * 100) : 0;
       document.getElementById('progress-bar').style.width = `${pct}%`;
       document.getElementById('progress-pct').innerText = `${pct}%`;
 
       applyFilters();
     });
 
-    // Funções de Controle no Firebase
     window.toggleItem = (id) => {
       const status = getItemStatus(id);
       const newCaptured = !status.captured;
-      // Se desmarcar como capturado, retira a coroa automaticamente
       const newCrowned = newCaptured ? status.crowned : false;
       
       set(ref(db, `elementais_status/${id}`), {
@@ -376,7 +371,6 @@
     window.toggleCrown = (id) => {
       const status = getItemStatus(id);
       const newCrowned = !status.crowned;
-      // Se ativar coroa, marca automaticamente como capturado
       const newCaptured = newCrowned ? true : status.captured;
 
       set(ref(db, `elementais_status/${id}`), {
@@ -433,7 +427,7 @@
 <body class="bg-slate-950 text-slate-100 min-h-screen p-4 sm:p-8 font-sans selection:bg-cyan-500 selection:text-black">
   <div class="max-w-7xl mx-auto">
     
-    <!-- Top Header / Dashboard -->
+    <!-- Top Header -->
     <header class="mb-6 p-6 rounded-2xl bg-slate-900/60 border border-slate-800 backdrop-blur-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
       <div>
         <div class="flex items-center gap-2 mb-1">
@@ -463,9 +457,8 @@
       </div>
     </header>
 
-    <!-- Barra de Filtros e Busca -->
-    <div class="mb-6 flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-900/40 p-3 rounded-xl border border-slate-800/80">      
-      <!-- Botões de Status (Todos / Obtidos / Dominados / Faltando) -->
+    <!-- Filtros e Busca -->
+    <div class="mb-6 flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-900/40 p-3 rounded-xl border border-slate-800/80">
       <div class="flex items-center gap-2 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
         <button id="btn-all" onclick="setFilter('all')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500 text-slate-950 shadow-md flex items-center gap-1.5 transition-all">
           <span>Todos</span>
@@ -491,7 +484,6 @@
         </button>
       </div>
 
-      <!-- Campo de Pesquisa -->
       <div class="relative w-full sm:w-64">
         <input 
           type="text" 
@@ -503,19 +495,19 @@
       </div>
     </div>
 
-    <!-- Mensagem de lista vazia após filtro -->
+    <!-- Mensagem de lista vazia -->
     <div id="empty-msg" class="hidden text-center py-16 text-slate-500 bg-slate-900/20 rounded-2xl border border-dashed border-slate-800">
       <p class="text-sm">Nenhum elemental corresponde aos filtros aplicados.</p>
     </div>
 
-    <!-- Grid dos 64 Elementais -->
+    <!-- Grid -->
     <main id="grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3">
-      <!-- Inserido dinamicamente pelo script -->
+      <!-- Inserido dinamicamente -->
     </main>
 
   </div>
 
-  <!-- Modal de Descrição e Habilidade -->
+  <!-- Modal -->
   <div id="info-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4" onclick="closeModal()">
     <div class="bg-slate-900 border border-slate-700 max-w-md w-full rounded-2xl p-6 shadow-2xl relative" onclick="event.stopPropagation()">
       <div class="flex items-start justify-between gap-3 mb-3">
