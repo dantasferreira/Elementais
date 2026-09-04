@@ -259,12 +259,6 @@ itensOcultos.forEach(id => {
     function applyFilters() {
       let visibleCount = 0;
 
-      // Se o item estiver marcado como hidden, ele nunca aparece na tela nem entra na contagem
-if (item.hidden) {
-  cardEl.classList.add('hidden');
-  return; 
-}
-
       elementaisData.forEach(item => {
         const cardEl = document.getElementById(`card-${item.id}`);
         const status = getItemStatus(item.id);
@@ -273,7 +267,7 @@ if (item.hidden) {
         if (currentFilter === 'checked') matchesFilter = status.captured;
         if (currentFilter === 'crowned') matchesFilter = status.crowned;
         if (currentFilter === 'missing') matchesFilter = !status.captured;
-
+        
         const matchesSearch = searchTerm === '' || 
           item.nome.toLowerCase().includes(searchTerm) || 
           item.versao.toLowerCase().includes(searchTerm) || 
@@ -285,6 +279,11 @@ if (item.hidden) {
         } else {
           cardEl.classList.add('hidden');
         }
+        // Se o item estiver marcado como hidden, ele nunca aparece na tela nem entra na contagem
+if (item.hidden) {
+  cardEl.classList.add('hidden');
+  return; 
+}
       });
 
       const emptyMsg = document.getElementById('empty-msg');
