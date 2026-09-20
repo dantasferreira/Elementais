@@ -17,7 +17,8 @@
     .badge-normal { background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.4); }
     .badge-dourado { background: rgba(234, 179, 8, 0.2); color: #fde047; border: 1px solid rgba(234, 179, 8, 0.4); }
     .badge-trapaca { background: rgba(168, 85, 247, 0.2); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.4); }
-    .badge-mitico { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); }
+    .badge-hacker { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); }
+    .badge-cacador { background: rgba(132, 112, 255, 0.2); color: #8470FF; border: 1px solid rgba(132, 112, 255, 0.4); }
 
     /* Efeito de Domínio (Coroa) */
     .card-crowned {
@@ -52,7 +53,7 @@
     // Adicione aqui dentro os IDs dos elementais que deseja deixar OCULTOS.
     // Exemplo: [4, 8, 12] oculta o Mítico de cada um deles.
     // =========================================================================
-    const IDS_OCULTOS = [54,55,56]; 
+    const IDS_OCULTOS = [5, 10, 15, 20, 25, 30, 35, 40, 45, 55, 60, 65, 67, 68, 69, 70, 75, 80, 85, 90, 95]; 
 
     // 16 Elementais base com descrições
     const baseElementais = [
@@ -71,14 +72,18 @@
       { nome: "Elemental Onigiri", desc: "Aplica o efeito Sobrecarga após consumir qualquer item de cura ou escudo." },
       { nome: "Elemental Mega Man", desc: "Reduz o atrito ao deslizar, permitindo que você deslize muito mais longe." },
       { nome: "Elemental Sobreescudo", desc: "Concede e regenera uma camada extra de Sobrescudo para o jogador." },
-      { nome: "Elemental Storm Scout", desc: "Nova criatura da Tempestade." }
+      { nome: "Elemental Storm Scout", desc: "Nova criatura da Tempestade." },
+      { nome: "Elemental Lagoa", desc: "Salto carregado mais alto." },
+      { nome: "Elemental Blinky", desc: "Invisivel por alguns segundo ao receber dano." },
+      { nome: "Elemental Crash", desc: "Ao saltar, gira e da dano circular ao redor." }
     ];
 
     const tipos = [
       { tipo: "Normal", badgeClass: "badge-normal" },
       { tipo: "Dourado", badgeClass: "badge-dourado" },
       { tipo: "Trapaça", badgeClass: "badge-trapaca" },
-      { tipo: "Hacker", badgeClass: "badge-mitico" }
+      { tipo: "Hacker", badgeClass: "badge-hacker" },
+      { tipo: "Caçador", badgeClass: "badge-cacador" }
     ];
 
     // Montagem dos itens
@@ -106,62 +111,76 @@
     elementaisData[2].img = "img/Elemental-Aventura-Trapaça.jpeg";
     elementaisData[3].img = "img/Elemental-Aventura-Mítico.jpeg";
     elementaisData[4].img = "img/Elemental-Moita-Normal.jpeg";
-    elementaisData[5].img = "img/Elemental-Moita-Dourado.jpeg";
-    elementaisData[6].img = "img/Elemental-Moita-Trapaça.jpeg";
-    elementaisData[7].img = "img/Elemental-Moita-Mítico.jpeg";
-    elementaisData[8].img = "img/Elemental-Jonesy-Normal.jpeg";
-    elementaisData[9].img = "img/Elemental-Jonesy-Dourado.jpeg";
-    elementaisData[10].img = "img/Elemental-Jonesy-Trapaça.jpeg";
-    elementaisData[11].img = "img/Elemental-Jonesy-Mítico.jpeg";
-    elementaisData[12].img = "img/Elemental-Sonic-Normal.jpeg";
-    elementaisData[13].img = "img/Elemental-Sonic-Dourado.jpeg";
-    elementaisData[14].img = "img/Elemental-Sonic-Trapaça.jpeg";
-    elementaisData[15].img = "img/Elemental-Sonic-Mítico.jpeg";
-    elementaisData[16].img = "img/Elemental-Tails-Normal.jpeg";
-    elementaisData[17].img = "img/Elemental-Tails-Dourado.jpeg";
-    elementaisData[18].img = "img/Elemental-Tails-Trapaça.jpeg";
-    elementaisData[19].img = "img/Elemental-Tails-Mítico.jpeg";
-    elementaisData[20].img = "img/Elemental-Klimbo-Normal.jpeg";
-    elementaisData[21].img = "img/Elemental-Klimbo-Dourado.jpeg";
-    elementaisData[22].img = "img/Elemental-Klimbo-Trapaça.jpeg";
-    elementaisData[23].img = "img/Elemental-Klimbo-Mítico.jpeg";
-    elementaisData[24].img = "img/Elemental-Jackrabbit-Normal.jpeg";
-    elementaisData[25].img = "img/Elemental-Jackrabbit-Dourado.jpeg";
-    elementaisData[26].img = "img/Elemental-Jackrabbit-Trapaça.jpeg";
-    elementaisData[27].img = "img/Elemental-Jackrabbit-Mítico.jpeg";
-    elementaisData[28].img = "img/Elemental-8-Bits-Normal.jpeg";
-    elementaisData[29].img = "img/Elemental-8-Bits-Dourado.jpeg";
-    elementaisData[30].img = "img/Elemental-8-Bits-Trapaça.jpeg";
-    elementaisData[31].img = "img/Elemental-8-Bits-Mítico.jpeg";
-    elementaisData[32].img = "img/Elemental-Shadow-Normal.jpeg";
-    elementaisData[33].img = "img/Elemental-Shadow-Dourado.jpeg";
-    elementaisData[34].img = "img/Elemental-Shadow-Trapaça.jpeg";
-    elementaisData[35].img = "img/Elemental-Shadow-Mítico.jpeg";
-    elementaisData[36].img = "img/Elemental-Coroa-Normal.jpeg";
-    elementaisData[37].img = "img/Elemental-Coroa-Dourado.jpeg";
-    elementaisData[38].img = "img/Elemental-Coroa-Trapaça.jpeg";
-    elementaisData[39].img = "img/Elemental-Coroa-Mítico.jpeg";
-    elementaisData[40].img = "img/Elemental-Disruptor-Normal.jpeg";
-    elementaisData[41].img = "img/Elemental-Disruptor-Dourado.jpeg";
-    elementaisData[42].img = "img/Elemental-Disruptor-Trapaça.jpeg";
-    elementaisData[43].img = "img/Elemental-Disruptor-Mítico.jpeg";
-    elementaisData[44].img = "img/Elemental-Raio-X-Normal.jpeg";
-    elementaisData[45].img = "img/Elemental-Raio-X-Dourado.jpeg";
-    elementaisData[46].img = "img/Elemental-Raio-X-Trapaça.jpeg";
-    elementaisData[47].img = "img/Elemental-Raio-X-Mítico.jpeg";
-    elementaisData[48].img = "img/Elemental-Onigiri-Normal.jpeg";
-    elementaisData[49].img = "img/Elemental-Onigiri-Dourado.jpeg";
-    elementaisData[50].img = "img/Elemental-Onigiri-Trapaça.jpeg";
-    elementaisData[51].img = "img/Elemental-Onigiri-Mítico.jpeg";
-    elementaisData[52].img = "img/Elemental-Mega-Man-Normal.jpeg";
-    elementaisData[56].img = "img/Elemental-Sobreescudo-Normal.jpeg";
-    elementaisData[57].img = "img/Elemental-Sobreescudo-Dourado.jpeg";
-    elementaisData[58].img = "img/Elemental-Sobreescudo-Trapaça.jpeg";
-    elementaisData[59].img = "img/Elemental-Sobreescudo-Mítico.jpeg";
-    elementaisData[60].img = "img/Elemental-Storm-Scout-Normal.jpeg";
-    elementaisData[61].img = "img/Elemental-Storm-Scout-Dourado.jpeg";
-    elementaisData[62].img = "img/Elemental-Storm-Scout-Trapaça.jpeg";
-    elementaisData[63].img = "img/Elemental-Storm-Scout-Mítico.jpeg";
+    elementaisData[6].img = "img/Elemental-Moita-Dourado.jpeg";
+    elementaisData[7].img = "img/Elemental-Moita-Trapaça.jpeg";
+    elementaisData[8].img = "img/Elemental-Moita-Mítico.jpeg";
+    elementaisData[10].img = "img/Elemental-Jonesy-Normal.jpeg";
+    elementaisData[11].img = "img/Elemental-Jonesy-Dourado.jpeg";
+    elementaisData[12].img = "img/Elemental-Jonesy-Trapaça.jpeg";
+    elementaisData[13].img = "img/Elemental-Jonesy-Mítico.jpeg";
+    elementaisData[15].img = "img/Elemental-Sonic-Normal.jpeg";
+    elementaisData[16].img = "img/Elemental-Sonic-Dourado.jpeg";
+    elementaisData[17].img = "img/Elemental-Sonic-Trapaça.jpeg";
+    elementaisData[18].img = "img/Elemental-Sonic-Mítico.jpeg";
+    elementaisData[20].img = "img/Elemental-Tails-Normal.jpeg";
+    elementaisData[21].img = "img/Elemental-Tails-Dourado.jpeg";
+    elementaisData[22].img = "img/Elemental-Tails-Trapaça.jpeg";
+    elementaisData[23].img = "img/Elemental-Tails-Mítico.jpeg";
+    elementaisData[25].img = "img/Elemental-Klimbo-Normal.jpeg";
+    elementaisData[26].img = "img/Elemental-Klimbo-Dourado.jpeg";
+    elementaisData[27].img = "img/Elemental-Klimbo-Trapaça.jpeg";
+    elementaisData[28].img = "img/Elemental-Klimbo-Mítico.jpeg";
+    elementaisData[30].img = "img/Elemental-Jackrabbit-Normal.jpeg";
+    elementaisData[31].img = "img/Elemental-Jackrabbit-Dourado.jpeg";
+    elementaisData[32].img = "img/Elemental-Jackrabbit-Trapaça.jpeg";
+    elementaisData[33].img = "img/Elemental-Jackrabbit-Mítico.jpeg";
+    elementaisData[35].img = "img/Elemental-8-Bits-Normal.jpeg";
+    elementaisData[36].img = "img/Elemental-8-Bits-Dourado.jpeg";
+    elementaisData[37].img = "img/Elemental-8-Bits-Trapaça.jpeg";
+    elementaisData[38].img = "img/Elemental-8-Bits-Mítico.jpeg";
+    elementaisData[40].img = "img/Elemental-Shadow-Normal.jpeg";
+    elementaisData[41].img = "img/Elemental-Shadow-Dourado.jpeg";
+    elementaisData[42].img = "img/Elemental-Shadow-Trapaça.jpeg";
+    elementaisData[43].img = "img/Elemental-Shadow-Mítico.jpeg";
+    elementaisData[45].img = "img/Elemental-Coroa-Normal.jpeg";
+    elementaisData[46].img = "img/Elemental-Coroa-Dourado.jpeg";
+    elementaisData[47].img = "img/Elemental-Coroa-Trapaça.jpeg";
+    elementaisData[48].img = "img/Elemental-Coroa-Mítico.jpeg";
+    elementaisData[49].img = "img/Elemental-Coroa-Cacador.jpeg";
+    elementaisData[50].img = "img/Elemental-Disruptor-Normal.jpeg";
+    elementaisData[51].img = "img/Elemental-Disruptor-Dourado.jpeg";
+    elementaisData[52].img = "img/Elemental-Disruptor-Trapaça.jpeg";
+    elementaisData[53].img = "img/Elemental-Disruptor-Mítico.jpeg";
+    elementaisData[55].img = "img/Elemental-Raio-X-Normal.jpeg";
+    elementaisData[56].img = "img/Elemental-Raio-X-Dourado.jpeg";
+    elementaisData[57].img = "img/Elemental-Raio-X-Trapaça.jpeg";
+    elementaisData[58].img = "img/Elemental-Raio-X-Mítico.jpeg";
+    elementaisData[60].img = "img/Elemental-Onigiri-Normal.jpeg";
+    elementaisData[61].img = "img/Elemental-Onigiri-Dourado.jpeg";
+    elementaisData[62].img = "img/Elemental-Onigiri-Trapaça.jpeg";
+    elementaisData[63].img = "img/Elemental-Onigiri-Mítico.jpeg";
+    elementaisData[65].img = "img/Elemental-Mega-Man-Normal.jpeg";
+    elementaisData[69].img = "img/Elemental-Sobreescudo-Normal.jpeg";
+    elementaisData[70].img = "img/Elemental-Sobreescudo-Dourado.jpeg";
+    elementaisData[71].img = "img/Elemental-Sobreescudo-Trapaça.jpeg";
+    elementaisData[72].img = "img/Elemental-Sobreescudo-Mítico.jpeg";
+    elementaisData[74].img = "img/Elemental-Storm-Scout-Normal.jpeg";
+    elementaisData[75].img = "img/Elemental-Storm-Scout-Dourado.jpeg";
+    elementaisData[76].img = "img/Elemental-Storm-Scout-Trapaça.jpeg";
+    elementaisData[77].img = "img/Elemental-Storm-Scout-Mítico.jpeg";
+    elementaisData[79].img = "img/Elemental-Lagoa-Normal.jpeg";
+    elementaisData[80].img = "img/Elemental-Lagoa-Dourado.jpeg";
+    elementaisData[81].img = "img/Elemental-Lagoa-Trapaça.jpeg";
+    elementaisData[82].img = "img/Elemental-Lagoa-Mítico.jpeg";
+    elementaisData[84].img = "img/Elemental-Blinky-Normal.jpeg";
+    elementaisData[85].img = "img/Elemental-Blinky-Dourado.jpeg";
+    elementaisData[86].img = "img/Elemental-Blinky-Trapaça.jpeg";
+    elementaisData[87].img = "img/Elemental-Blinky-Mítico.jpeg";
+    elementaisData[89].img = "img/Elemental-Crash-Normal.jpeg";
+    elementaisData[90].img = "img/Elemental-Crash-Dourado.jpeg";
+    elementaisData[91].img = "img/Elemental-Crash-Trapaça.jpeg";
+    elementaisData[92].img = "img/Elemental-Crash-Mítico.jpeg";
+
 
     // Variáveis de controle de filtro
     let currentFilter = 'all'; // 'all', 'checked', 'crowned', 'missing'
@@ -214,7 +233,7 @@
         <div class="mt-3 flex items-center justify-between gap-1 pt-2 border-t border-slate-800/80">
           <!-- Info de Habilidade -->
           <button type="button" onclick="showModal(${item.id})" class="text-slate-400 hover:text-cyan-400 p-1 rounded-md text-xs flex items-center gap-1 transition-colors" title="Ver Habilidade">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path stroke-width="2" d="M12 16v-4m0-4h.01"/></svg>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path troke-width="2" d="M12 16v-4m0-4h.01"/></svg>
             <span class="text-[10px] hidden sm:inline">Info</span>
           </button>
 
