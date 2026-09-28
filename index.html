@@ -19,6 +19,7 @@
     .badge-trapaca { background: rgba(168, 85, 247, 0.2); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.4); }
     .badge-hacker { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); }
     .badge-cacador { background: rgba(132, 112, 255, 0.2); color: #8470FF; border: 1px solid rgba(132, 112, 255, 0.4); }
+    .badge-mitico { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); }
 
     /* Efeito de Domínio (Coroa) */
     .card-crowned {
@@ -31,7 +32,7 @@
   <!-- Firebase SDK -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, onValue, set, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAruvFG2YHwaEesq-izCzDBfNvmX9F-uC0",
@@ -46,16 +47,13 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-    const itemsRef = ref(db, 'elementais_status');
 
-    // =========================================================================
-    // ⚙️ CONFIGURAÇÃO DE OCULTAÇÃO / REMOÇÃO:
-    // Adicione aqui dentro os IDs dos elementais que deseja deixar OCULTOS.
-    // Exemplo: [4, 8, 12] oculta o Mítico de cada um deles.
-    // =========================================================================
+    // Sistema de Usuário Individual
+    let currentUser = localStorage.getItem('fortnite_elementais_user') || 'Jogador1';
+    let currentListenerUnsubscribe = null;
+
     const IDS_OCULTOS = [5, 10, 15, 20, 25, 30, 35, 40, 45, 55, 60, 65, 67, 68, 69, 70, 75, 80, 85, 90, 95]; 
 
-    // 16 Elementais base com descrições
     const baseElementais = [
       { nome: "Elemental Aventura", desc: "Melhora aleatoriamente a raridade de um item do inventário a cada nível ganho." },
       { nome: "Elemental Guarda da Moita", desc: "Cria um arbusto ao seu redor periodicamente; gera uma moita ao ser eliminado no nível máximo." },
@@ -77,7 +75,7 @@
       { nome: "Elemental Blinky", desc: "Invisivel por alguns segundo ao receber dano." },
       { nome: "Elemental Crash", desc: "Ao saltar, gira e da dano circular ao redor." },
       { nome: "Elemental Morgana", desc: "Aumenta a eficácia dos itens de cura" },
-      { nome: "Elemental Aniversário", desc: "Abrir baús tem uma chance de gerar um pedaço de bolo. Eliminações podem gerar bolo no nível máximo." },
+      { nome: "Elemental Aniversário", desc: "Abrir baús tem uma chance de gerar um pedaço de bolo. Eliminações podem gerar bolo no nível máximo." }
     ];
 
     const tipos = [
@@ -88,8 +86,7 @@
       { tipo: "Caçador", badgeClass: "badge-cacador" }
     ];
 
-    // Montagem dos itens
-    const elementaisData = [];
+    let elementaisData = [];
     let counter = 1;
 
     baseElementais.forEach((el) => {
@@ -101,113 +98,120 @@
           versao: t.tipo,
           badgeClass: t.badgeClass,
           img: "",
-          hidden: IDS_OCULTOS.includes(counter) // Marca se está oculto
+          hidden: IDS_OCULTOS.includes(counter)
         });
         counter++;
       });
     });
 
-    // Mapeamento das imagens
-    elementaisData[0].img = "img/Elemental-Aventura-Normal.jpeg";
-    elementaisData[1].img = "img/Elemental-Aventura-Dourado.jpeg";
-    elementaisData[2].img = "img/Elemental-Aventura-Trapaça.jpeg";
-    elementaisData[3].img = "img/Elemental-Aventura-Mítico.jpeg";
-    elementaisData[5].img = "img/Elemental-Moita-Normal.jpeg";
-    elementaisData[6].img = "img/Elemental-Moita-Dourado.jpeg";
-    elementaisData[7].img = "img/Elemental-Moita-Trapaça.jpeg";
-    elementaisData[8].img = "img/Elemental-Moita-Mítico.jpeg";
-    elementaisData[10].img = "img/Elemental-Jonesy-Normal.jpeg";
-    elementaisData[11].img = "img/Elemental-Jonesy-Dourado.jpeg";
-    elementaisData[12].img = "img/Elemental-Jonesy-Trapaça.jpeg";
-    elementaisData[13].img = "img/Elemental-Jonesy-Mítico.jpeg";
-    elementaisData[15].img = "img/Elemental-Sonic-Normal.jpeg";
-    elementaisData[16].img = "img/Elemental-Sonic-Dourado.jpeg";
-    elementaisData[17].img = "img/Elemental-Sonic-Trapaça.jpeg";
-    elementaisData[18].img = "img/Elemental-Sonic-Mítico.jpeg";
-    elementaisData[20].img = "img/Elemental-Tails-Normal.jpeg";
-    elementaisData[21].img = "img/Elemental-Tails-Dourado.jpeg";
-    elementaisData[22].img = "img/Elemental-Tails-Trapaça.jpeg";
-    elementaisData[23].img = "img/Elemental-Tails-Mítico.jpeg";
-    elementaisData[25].img = "img/Elemental-Klimbo-Normal.jpeg";
-    elementaisData[26].img = "img/Elemental-Klimbo-Dourado.jpeg";
-    elementaisData[27].img = "img/Elemental-Klimbo-Trapaça.jpeg";
-    elementaisData[28].img = "img/Elemental-Klimbo-Mítico.jpeg";
-    elementaisData[30].img = "img/Elemental-Jackrabbit-Normal.jpeg";
-    elementaisData[31].img = "img/Elemental-Jackrabbit-Dourado.jpeg";
-    elementaisData[32].img = "img/Elemental-Jackrabbit-Trapaça.jpeg";
-    elementaisData[33].img = "img/Elemental-Jackrabbit-Mítico.jpeg";
-    elementaisData[35].img = "img/Elemental-8-Bits-Normal.jpeg";
-    elementaisData[36].img = "img/Elemental-8-Bits-Dourado.jpeg";
-    elementaisData[37].img = "img/Elemental-8-Bits-Trapaça.jpeg";
-    elementaisData[38].img = "img/Elemental-8-Bits-Mítico.jpeg";
-    elementaisData[40].img = "img/Elemental-Shadow-Normal.jpeg";
-    elementaisData[41].img = "img/Elemental-Shadow-Dourado.jpeg";
-    elementaisData[42].img = "img/Elemental-Shadow-Trapaça.jpeg";
-    elementaisData[43].img = "img/Elemental-Shadow-Mítico.jpeg";
-    elementaisData[45].img = "img/Elemental-Coroa-Normal.jpeg";
-    elementaisData[46].img = "img/Elemental-Coroa-Dourado.jpeg";
-    elementaisData[47].img = "img/Elemental-Coroa-Trapaça.jpeg";
-    elementaisData[48].img = "img/Elemental-Coroa-Mítico.jpeg";
-    elementaisData[49].img = "img/Elemental-Coroa-Cacador.jpeg";
-    elementaisData[50].img = "img/Elemental-Disruptor-Normal.jpeg";
-    elementaisData[51].img = "img/Elemental-Disruptor-Dourado.jpeg";
-    elementaisData[52].img = "img/Elemental-Disruptor-Trapaça.jpeg";
-    elementaisData[53].img = "img/Elemental-Disruptor-Mítico.jpeg";
-    elementaisData[55].img = "img/Elemental-Raio-X-Normal.jpeg";
-    elementaisData[56].img = "img/Elemental-Raio-X-Dourado.jpeg";
-    elementaisData[57].img = "img/Elemental-Raio-X-Trapaça.jpeg";
-    elementaisData[58].img = "img/Elemental-Raio-X-Mítico.jpeg";
-    elementaisData[60].img = "img/Elemental-Onigiri-Normal.jpeg";
-    elementaisData[61].img = "img/Elemental-Onigiri-Dourado.jpeg";
-    elementaisData[62].img = "img/Elemental-Onigiri-Trapaça.jpeg";
-    elementaisData[63].img = "img/Elemental-Onigiri-Mítico.jpeg";
-    elementaisData[65].img = "img/Elemental-Mega-Man-Normal.jpeg";
-    elementaisData[70].img = "img/Elemental-Sobreescudo-Normal.jpeg";
-    elementaisData[71].img = "img/Elemental-Sobreescudo-Dourado.jpeg";
-    elementaisData[72].img = "img/Elemental-Sobreescudo-Trapaça.jpeg";
-    elementaisData[73].img = "img/Elemental-Sobreescudo-Mítico.jpeg";
-    elementaisData[75].img = "img/Elemental-Storm-Scout-Normal.jpeg";
-    elementaisData[76].img = "img/Elemental-Storm-Scout-Dourado.jpeg";
-    elementaisData[77].img = "img/Elemental-Storm-Scout-Trapaça.jpeg";
-    elementaisData[78].img = "img/Elemental-Storm-Scout-Mítico.jpeg";
-    elementaisData[80].img = "img/Elemental-Lagoa-Normal.jpeg";
-    elementaisData[81].img = "img/Elemental-Lagoa-Dourado.jpeg";
-    elementaisData[82].img = "img/Elemental-Lagoa-Trapaça.jpeg";
-    elementaisData[83].img = "img/Elemental-Lagoa-Mítico.jpeg";
-    elementaisData[85].img = "img/Elemental-Blinky-Normal.jpeg";
-    elementaisData[86].img = "img/Elemental-Blinky-Dourado.jpeg";
-    elementaisData[87].img = "img/Elemental-Blinky-Trapaça.jpeg";
-    elementaisData[88].img = "img/Elemental-Blinky-Mítico.jpeg";
-    elementaisData[90].img = "img/Elemental-Crash-Normal.jpeg";
-    elementaisData[91].img = "img/Elemental-Crash-Dourado.jpeg";
-    elementaisData[92].img = "img/Elemental-Crash-Trapaça.jpeg";
-    elementaisData[93].img = "img/Elemental-Crash-Mítico.jpeg";
-    elementaisData[95].img = "img/Elemental-Morgana-Normal.jpeg";
-    elementaisData[96].img = "img/Elemental-Morgana-Dourado.jpeg";
-    elementaisData[97].img = "img/Elemental-Morgana-Trapaca.jpeg";
-    elementaisData[98].img = "img/Elemental-Morgana-Hacker.jpeg";
-    elementaisData[99].img = "img/Elemental-Morgana-Cacador.jpeg";
-    elementaisData[100].img = "img/Elemental-aniversario-Normal.jpeg";
-    elementaisData[101].img = "img/Elemental-aniversario-Dourado.jpeg";
-    elementaisData[102].img = "img/Elemental-aniversario-Trapaca.jpeg";
-    elementaisData[103].img = "img/Elemental-aniversario-Hacker.jpeg";
-    elementaisData[104].img = "img/Elemental-aniversario-Cacador.jpeg";
+    // Imagens Base pré-configuradas
+    const preImgs = {
+      0: "img/Elemental-Aventura-Normal.jpeg",
+      1: "img/Elemental-Aventura-Dourado.jpeg",
+      2: "img/Elemental-Aventura-Trapaça.jpeg",
+      3: "img/Elemental-Aventura-Mítico.jpeg",
+      5: "img/Elemental-Moita-Normal.jpeg",
+      6: "img/Elemental-Moita-Dourado.jpeg",
+      7: "img/Elemental-Moita-Trapaça.jpeg",
+      8: "img/Elemental-Moita-Mítico.jpeg",
+      10: "img/Elemental-Jonesy-Normal.jpeg",
+      11: "img/Elemental-Jonesy-Dourado.jpeg",
+      12: "img/Elemental-Jonesy-Trapaça.jpeg",
+      13: "img/Elemental-Jonesy-Mítico.jpeg",
+      15: "img/Elemental-Sonic-Normal.jpeg",
+      16: "img/Elemental-Sonic-Dourado.jpeg",
+      17: "img/Elemental-Sonic-Trapaça.jpeg",
+      18: "img/Elemental-Sonic-Mítico.jpeg",
+      20: "img/Elemental-Tails-Normal.jpeg",
+      21: "img/Elemental-Tails-Dourado.jpeg",
+      22: "img/Elemental-Tails-Trapaça.jpeg",
+      23: "img/Elemental-Tails-Mítico.jpeg",
+      25: "img/Elemental-Klimbo-Normal.jpeg",
+      26: "img/Elemental-Klimbo-Dourado.jpeg",
+      27: "img/Elemental-Klimbo-Trapaça.jpeg",
+      28: "img/Elemental-Klimbo-Mítico.jpeg",
+      30: "img/Elemental-Jackrabbit-Normal.jpeg",
+      31: "img/Elemental-Jackrabbit-Dourado.jpeg",
+      32: "img/Elemental-Jackrabbit-Trapaça.jpeg",
+      33: "img/Elemental-Jackrabbit-Mítico.jpeg",
+      35: "img/Elemental-8-Bits-Normal.jpeg",
+      36: "img/Elemental-8-Bits-Dourado.jpeg",
+      37: "img/Elemental-8-Bits-Trapaça.jpeg",
+      38: "img/Elemental-8-Bits-Mítico.jpeg",
+      40: "img/Elemental-Shadow-Normal.jpeg",
+      41: "img/Elemental-Shadow-Dourado.jpeg",
+      42: "img/Elemental-Shadow-Trapaça.jpeg",
+      43: "img/Elemental-Shadow-Mítico.jpeg",
+      45: "img/Elemental-Coroa-Normal.jpeg",
+      46: "img/Elemental-Coroa-Dourado.jpeg",
+      47: "img/Elemental-Coroa-Trapaça.jpeg",
+      48: "img/Elemental-Coroa-Mítico.jpeg",
+      49: "img/Elemental-Coroa-Cacador.jpeg",
+      50: "img/Elemental-Disruptor-Normal.jpeg",
+      51: "img/Elemental-Disruptor-Dourado.jpeg",
+      52: "img/Elemental-Disruptor-Trapaça.jpeg",
+      53: "img/Elemental-Disruptor-Mítico.jpeg",
+      55: "img/Elemental-Raio-X-Normal.jpeg",
+      56: "img/Elemental-Raio-X-Dourado.jpeg",
+      57: "img/Elemental-Raio-X-Trapaça.jpeg",
+      58: "img/Elemental-Raio-X-Mítico.jpeg",
+      60: "img/Elemental-Onigiri-Normal.jpeg",
+      61: "img/Elemental-Onigiri-Dourado.jpeg",
+      62: "img/Elemental-Onigiri-Trapaça.jpeg",
+      63: "img/Elemental-Onigiri-Mítico.jpeg",
+      65: "img/Elemental-Mega-Man-Normal.jpeg",
+      70: "img/Elemental-Sobreescudo-Normal.jpeg",
+      71: "img/Elemental-Sobreescudo-Dourado.jpeg",
+      72: "img/Elemental-Sobreescudo-Trapaça.jpeg",
+      73: "img/Elemental-Sobreescudo-Mítico.jpeg",
+      75: "img/Elemental-Storm-Scout-Normal.jpeg",
+      76: "img/Elemental-Storm-Scout-Dourado.jpeg",
+      77: "img/Elemental-Storm-Scout-Trapaça.jpeg",
+      78: "img/Elemental-Storm-Scout-Mítico.jpeg",
+      80: "img/Elemental-Lagoa-Normal.jpeg",
+      81: "img/Elemental-Lagoa-Dourado.jpeg",
+      82: "img/Elemental-Lagoa-Trapaça.jpeg",
+      83: "img/Elemental-Lagoa-Mítico.jpeg",
+      85: "img/Elemental-Blinky-Normal.jpeg",
+      86: "img/Elemental-Blinky-Dourado.jpeg",
+      87: "img/Elemental-Blinky-Trapaça.jpeg",
+      88: "img/Elemental-Blinky-Mítico.jpeg",
+      90: "img/Elemental-Crash-Normal.jpeg",
+      91: "img/Elemental-Crash-Dourado.jpeg",
+      92: "img/Elemental-Crash-Trapaça.jpeg",
+      93: "img/Elemental-Crash-Mítico.jpeg",
+      95: "img/Elemental-Morgana-Normal.jpeg",
+      96: "img/Elemental-Morgana-Dourado.jpeg",
+      97: "img/Elemental-Morgana-Trapaca.jpeg",
+      98: "img/Elemental-Morgana-Hacker.jpeg",
+      99: "img/Elemental-Morgana-Cacador.jpeg",
+      100: "img/Elemental-aniversario-Normal.jpeg",
+      101: "img/Elemental-aniversario-Dourado.jpeg",
+      102: "img/Elemental-aniversario-Trapaca.jpeg",
+      103: "img/Elemental-aniversario-Hacker.jpeg",
+      104: "img/Elemental-aniversario-Cacador.jpeg"
+    };
 
+    Object.keys(preImgs).forEach(idx => {
+      if (elementaisData[idx]) elementaisData[idx].img = preImgs[idx];
+    });
 
-    // Variáveis de controle de filtro
-    let currentFilter = 'all'; // 'all', 'checked', 'crowned', 'missing'
+    let currentFilter = 'all';
     let searchTerm = '';
-    let currentState = {};
+    let userState = {};
 
     const grid = document.getElementById('grid');
 
-    // Renderiza a interface inicial
-    elementaisData.forEach(item => {
-      const card = document.createElement('div');
-      card.id = `card-${item.id}`;
+    function renderCard(item) {
+      let card = document.getElementById(`card-${item.id}`);
+      if (!card) {
+        card = document.createElement('div');
+        card.id = `card-${item.id}`;
+        grid.appendChild(card);
+      }
+
       card.className = "relative flex flex-col justify-between p-3 rounded-xl border border-slate-800 bg-slate-900/90 hover:border-slate-600 transition-all select-none group";
 
-      // Se estiver oculto por padrão, não exibe
       if (item.hidden) {
         card.classList.add('hidden');
       }
@@ -232,7 +236,6 @@
           </div>
           
           <div class="relative">
-            <!--Selo de Coroa Flutuante sobre a imagem -->
             <div id="crown-badge-${item.id}" class="hidden absolute top-1 right-1 bg-amber-500/90 text-black px-1.5 py-0.5 rounded-md text-[10px] font-bold shadow-lg flex items-center gap-0.5 z-10">
               👑 DOMINADO
             </div>
@@ -245,12 +248,17 @@
         <div class="mt-3 flex items-center justify-between gap-1 pt-2 border-t border-slate-800/80">
           <!-- Info de Habilidade -->
           <button type="button" onclick="showModal(${item.id})" class="text-slate-400 hover:text-cyan-400 p-1 rounded-md text-xs flex items-center gap-1 transition-colors" title="Ver Habilidade">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path troke-width="2" d="M12 16v-4m0-4h.01"/></svg>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path stroke-width="2" d="M12 16v-4m0-4h.01"/></svg>
             <span class="text-[10px] hidden sm:inline">Info</span>
           </button>
 
+          <!-- Anotação Pessoal / Secreta -->
+          <button type="button" onclick="openNotesModal(${item.id})" class="text-slate-400 hover:text-amber-300 p-1 rounded-md text-xs flex items-center gap-0.5 transition-colors" title="Minhas Anotações Secretas">
+            <span class="text-xs">📝</span>
+            <span id="note-indicator-${item.id}" class="w-1.5 h-1.5 rounded-full bg-amber-400 hidden"></span>
+          </button>
+
           <div class="flex items-center gap-1.5">
-            <!-- Botão de Coroa (Dominar) -->
             <button 
               type="button" 
               id="crown-btn-${item.id}" 
@@ -261,7 +269,6 @@
               👑
             </button>
 
-            <!-- Checkbox de Captura -->
             <button 
               type="button" 
               id="check-${item.id}" 
@@ -274,30 +281,47 @@
           </div>
         </div>
       `;
+    }
 
-      grid.appendChild(card);
+    // Renderiza a lista inicial
+    elementaisData.forEach(item => renderCard(item));
+
+    // Escuta Elementais criados dinamicamente via Firebase
+    const customRef = ref(db, 'custom_elementais');
+    onValue(customRef, (snapshot) => {
+      const customs = snapshot.val() || {};
+      Object.keys(customs).forEach(key => {
+        const cItem = customs[key];
+        const existingIdx = elementaisData.findIndex(x => x.id === cItem.id);
+        if (existingIdx >= 0) {
+          elementaisData[existingIdx] = cItem;
+        } else {
+          elementaisData.push(cItem);
+        }
+        renderCard(cItem);
+      });
+      updateUserView();
     });
 
-    // Utilitário para verificar status
     function getItemStatus(id) {
-      const val = currentState[id];
+      const val = userState[id];
       if (typeof val === 'boolean') {
-        return { captured: val, crowned: false };
+        return { captured: val, crowned: false, note: '' };
       }
       return {
         captured: Boolean(val?.captured),
-        crowned: Boolean(val?.crowned)
+        crowned: Boolean(val?.crowned),
+        note: val?.note || ''
       };
     }
 
-    // Aplica os filtros de visibilidade
     function applyFilters() {
       let visibleCount = 0;
 
       elementaisData.forEach(item => {
         const cardEl = document.getElementById(`card-${item.id}`);
-        
-        // Se estiver na lista de ocultos, nunca renderiza
+        if (!cardEl) return;
+
         if (item.hidden) {
           cardEl.classList.add('hidden');
           return;
@@ -331,13 +355,9 @@
       }
     }
 
-    // Atualização em tempo real via Firebase
-    onValue(itemsRef, (snapshot) => {
-      currentState = snapshot.val() || {};
+    function updateUserView() {
       let totalChecked = 0;
       let totalCrowned = 0;
-
-      // Filtra apenas os itens ativos (não ocultos) para cálculo
       const activeItems = elementaisData.filter(x => !x.hidden);
 
       activeItems.forEach(item => {
@@ -345,12 +365,14 @@
         const crownBtn = document.getElementById(`crown-btn-${item.id}`);
         const crownBadge = document.getElementById(`crown-badge-${item.id}`);
         const cardEl = document.getElementById(`card-${item.id}`);
+        const noteDot = document.getElementById(`note-indicator-${item.id}`);
+        if (!checkEl) return;
+
         const status = getItemStatus(item.id);
 
         if (status.captured) totalChecked++;
         if (status.crowned) totalCrowned++;
 
-        // Render Check de Captura
         if (status.captured) {
           checkEl.className = "w-7 h-7 rounded-md bg-emerald-500 border-2 border-emerald-400 flex items-center justify-center text-slate-950 font-bold text-xs shadow-[0_0_10px_rgba(16,185,129,0.3)]";
           checkEl.textContent = "✓";
@@ -361,7 +383,6 @@
           cardEl.classList.remove("bg-emerald-950/20", "border-emerald-500/50");
         }
 
-        // Render Efeito de Coroa (Dominado)
         if (status.crowned) {
           crownBtn.className = "w-7 h-7 rounded-md bg-amber-500 border border-amber-400 flex items-center justify-center text-xs text-black font-bold shadow-[0_0_10px_rgba(245,158,11,0.5)]";
           crownBadge.classList.remove("hidden");
@@ -371,12 +392,19 @@
           crownBadge.classList.add("hidden");
           cardEl.classList.remove("card-crowned");
         }
+
+        if (noteDot) {
+          if (status.note && status.note.trim() !== '') {
+            noteDot.classList.remove('hidden');
+          } else {
+            noteDot.classList.add('hidden');
+          }
+        }
       });
 
       const total = activeItems.length;
       const totalMissing = total - totalChecked;
 
-      // Atualiza contadores
       document.getElementById('counter').innerText = `${totalChecked} / ${total}`;
       document.getElementById('crowned-counter').innerText = `${totalCrowned} Dominados`;
       document.getElementById('count-all').innerText = total;
@@ -389,36 +417,140 @@
       document.getElementById('progress-pct').innerText = `${pct}%`;
 
       applyFilters();
-    });
+    }
 
-    // Funções de Controle no Firebase
+    // Configura ou alterna o perfil de usuário ativo
+    function setupUserListener(username) {
+      currentUser = username.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '') || 'jogador1';
+      localStorage.setItem('fortnite_elementais_user', currentUser);
+      document.getElementById('current-username-display').innerText = currentUser.toUpperCase();
+      document.getElementById('user-input').value = currentUser;
+
+      const userRef = ref(db, `user_data/${currentUser}`);
+      onValue(userRef, (snapshot) => {
+        userState = snapshot.val() || {};
+        updateUserView();
+      });
+    }
+
+    // Inicializa com o usuário atual
+    setupUserListener(currentUser);
+
+    // Controles Globais
+    window.changeUser = () => {
+      const inputVal = document.getElementById('user-input').value;
+      if (!inputVal.trim()) return;
+      setupUserListener(inputVal);
+    };
+
     window.toggleItem = (id) => {
       const status = getItemStatus(id);
       const newCaptured = !status.captured;
-      // Se desmarcar como capturado, retira a coroa automaticamente
       const newCrowned = newCaptured ? status.crowned : false;
       
-      set(ref(db, `elementais_status/${id}`), {
+      set(ref(db, `user_data/${currentUser}/${id}`), {
         captured: newCaptured,
-        crowned: newCrowned
+        crowned: newCrowned,
+        note: status.note || ''
       });
     };
 
     window.toggleCrown = (id) => {
       const status = getItemStatus(id);
       const newCrowned = !status.crowned;
-      // Se ativar coroa, marca automaticamente como capturado
       const newCaptured = newCrowned ? true : status.captured;
 
-      set(ref(db, `elementais_status/${id}`), {
+      set(ref(db, `user_data/${currentUser}/${id}`), {
         captured: newCaptured,
-        crowned: newCrowned
+        crowned: newCrowned,
+        note: status.note || ''
+      });
+    };
+
+    // Modal de Anotações Individuais
+    let currentNoteId = null;
+    window.openNotesModal = (id) => {
+      currentNoteId = id;
+      const item = elementaisData.find(x => x.id === id);
+      const status = getItemStatus(id);
+
+      document.getElementById('note-modal-title').innerText = `${item.nome} (${item.versao})`;
+      document.getElementById('note-text').value = status.note || '';
+      document.getElementById('notes-modal').classList.remove('hidden');
+    };
+
+    window.saveNote = () => {
+      if (!currentNoteId) return;
+      const text = document.getElementById('note-text').value;
+      const status = getItemStatus(currentNoteId);
+
+      set(ref(db, `user_data/${currentUser}/${currentNoteId}`), {
+        captured: status.captured,
+        crowned: status.crowned,
+        note: text
+      });
+      closeNotesModal();
+    };
+
+    window.closeNotesModal = () => {
+      document.getElementById('notes-modal').classList.add('hidden');
+      currentNoteId = null;
+    };
+
+    // Modal de Cadastro de Novo Elemental
+    window.openNewElementalModal = () => {
+      document.getElementById('new-modal').classList.remove('hidden');
+    };
+
+    window.closeNewElementalModal = () => {
+      document.getElementById('new-modal').classList.add('hidden');
+    };
+
+    window.saveNewElemental = () => {
+      const nome = document.getElementById('new-nome').value.trim();
+      const versao = document.getElementById('new-versao').value;
+      const desc = document.getElementById('new-desc').value.trim();
+      const img = document.getElementById('new-img').value.trim();
+
+      if (!nome) {
+        alert("Por favor, digite o nome do Elemental.");
+        return;
+      }
+
+      // Calcula o próximo ID sequencial
+      const maxId = elementaisData.reduce((max, item) => Math.max(max, item.id), 0);
+      const newId = maxId + 1;
+
+      const badgeMap = {
+        "Normal": "badge-normal",
+        "Dourado": "badge-dourado",
+        "Trapaça": "badge-trapaca",
+        "Hacker": "badge-hacker",
+        "Caçador": "badge-cacador",
+        "Mítico": "badge-mitico"
+      };
+
+      const newItem = {
+        id: newId,
+        nome: nome.startsWith("Elemental") ? nome : `Elemental ${nome}`,
+        descricao: desc || "Habilidade não informada.",
+        versao: versao,
+        badgeClass: badgeMap[versao] || "badge-normal",
+        img: img || "#",
+        hidden: false
+      };
+
+      // Salva no nó compartilhado de elementais personalizados
+      set(ref(db, `custom_elementais/${newId}`), newItem).then(() => {
+        closeNewElementalModal();
+        document.getElementById('new-nome').value = '';
+        document.getElementById('new-desc').value = '';
+        document.getElementById('new-img').value = '';
       });
     };
 
     window.setFilter = (filterType) => {
       currentFilter = filterType;
-      
       const buttons = {
         'all': document.getElementById('btn-all'),
         'checked': document.getElementById('btn-checked'),
@@ -467,24 +599,25 @@
     <!-- Top Header -->
     <header class="mb-6 p-6 rounded-2xl bg-slate-900/60 border border-slate-800 backdrop-blur-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
       <div>
-        <div class="flex items-center gap-2 mb-1">
+        <div class="flex items-center gap-3 mb-1">
           <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span class="text-xs font-mono uppercase tracking-widest text-slate-400">Sincronização ao Vivo</span>
+          <span class="text-xs font-mono uppercase tracking-widest text-slate-400">Painel Individual Privado</span>
+          <span class="text-xs font-mono px-2 py-0.5 rounded bg-cyan-950 border border-cyan-500/40 text-cyan-300 font-bold" id="current-username-display">JOGADOR</span>
         </div>
         <h1 class="text-2xl sm:text-3xl font-bold font-gaming text-white tracking-wide">
           ESPÍRITOS ELEMENTAIS // <span class="text-cyan-400">FORTNITE</span>
         </h1>
-        <p class="text-sm text-slate-400 mt-1">Checklist coletivo personalizável em tempo real.</p>
+        <p class="text-sm text-slate-400 mt-1">Anotações e capturas individuais com cadastro dinâmico em tempo real.</p>
       </div>
 
-      <!-- Barra de Progresso Global -->
+      <!-- Barra de Progresso Global do Jogador -->
       <div class="w-full md:w-72 bg-slate-950 p-4 rounded-xl border border-slate-800">
         <div class="flex justify-between items-center text-xs font-mono mb-2">
-          <span class="text-slate-400">Coletados</span>
+          <span class="text-slate-400">Meus Coletados</span>
           <div class="flex items-center gap-2">
             <span id="crowned-counter" class="text-amber-400 font-bold text-[11px]">0 Dominados</span>
             <span class="text-slate-600">|</span>
-            <span id="counter" class="text-emerald-400 font-bold">0 / 64</span>
+            <span id="counter" class="text-emerald-400 font-bold">0 / 0</span>
           </div>
         </div>
         <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
@@ -494,12 +627,40 @@
       </div>
     </header>
 
+    <!-- Barra de Perfil & Adicionar Elemental -->
+    <div class="mb-4 flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+      <!-- Seletor de Perfil Privado -->
+      <div class="flex items-center gap-2 w-full sm:w-auto">
+        <span class="text-xs font-mono text-slate-400">Meu Perfil:</span>
+        <input 
+          type="text" 
+          id="user-input" 
+          placeholder="Seu Nick..." 
+          class="bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-white focus:outline-none focus:border-cyan-400 w-32 font-bold"
+        >
+        <button 
+          onclick="changeUser()" 
+          class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs rounded-lg border border-slate-700 transition-colors"
+        >
+          Trocar
+        </button>
+      </div>
+
+      <!-- Botão para Cadastrar Novo Elemental Instantaneamente -->
+      <button 
+        onclick="openNewElementalModal()" 
+        class="w-full sm:w-auto px-4 py-1.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 text-xs font-bold rounded-lg flex items-center justify-center gap-1.5 shadow-lg shadow-cyan-950/50 transition-all"
+      >
+        <span>+</span> Novo Elemental
+      </button>
+    </div>
+
     <!-- Filtros e Busca -->
     <div class="mb-6 flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-900/40 p-3 rounded-xl border border-slate-800/80">
       <div class="flex items-center gap-2 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
         <button id="btn-all" onclick="setFilter('all')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500 text-slate-950 shadow-md flex items-center gap-1.5 transition-all">
           <span>Todos</span>
-          <span id="count-all" class="bg-black/20 px-1.5 py-0.2 rounded text-[10px] font-mono">64</span>
+          <span id="count-all" class="bg-black/20 px-1.5 py-0.2 rounded text-[10px] font-mono">0</span>
         </button>
 
         <button id="btn-checked" onclick="setFilter('checked')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-750 hover:text-white flex items-center gap-1.5 transition-all">
@@ -517,11 +678,10 @@
         <button id="btn-missing" onclick="setFilter('missing')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-750 hover:text-white flex items-center gap-1.5 transition-all">
           <span class="text-amber-400">⏳</span>
           <span>Faltando</span>
-          <span id="count-missing" class="bg-slate-950/60 text-amber-400 px-1.5 py-0.2 rounded text-[10px] font-mono">64</span>
+          <span id="count-missing" class="bg-slate-950/60 text-amber-400 px-1.5 py-0.2 rounded text-[10px] font-mono">0</span>
         </button>
       </div>
 
-      <!-- Campo de Pesquisa -->
       <div class="relative w-full sm:w-64">
         <input 
           type="text" 
@@ -538,14 +698,13 @@
       <p class="text-sm">Nenhum elemental corresponde aos filtros aplicados.</p>
     </div>
 
-    <!-- Grid -->
+    <!-- Grid dos Elementais -->
     <main id="grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3">
-      <!-- Inserido dinamicamente -->
     </main>
 
   </div>
 
-  <!-- Modal -->
+  <!-- Modal de Descrição e Habilidade -->
   <div id="info-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4" onclick="closeModal()">
     <div class="bg-slate-900 border border-slate-700 max-w-md w-full rounded-2xl p-6 shadow-2xl relative" onclick="event.stopPropagation()">
       <div class="flex items-start justify-between gap-3 mb-3">
@@ -562,5 +721,78 @@
       </div>
     </div>
   </div>
+
+  <!-- Modal de Anotações Secretas Individuais -->
+  <div id="notes-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4" onclick="closeNotesModal()">
+    <div class="bg-slate-900 border border-slate-700 max-w-md w-full rounded-2xl p-6 shadow-2xl relative" onclick="event.stopPropagation()">
+      <div class="flex items-start justify-between gap-3 mb-2">
+        <div>
+          <h3 class="text-md font-bold text-amber-400 font-gaming flex items-center gap-1.5">
+            <span>📝</span> Minha Anotação Pessoal
+          </h3>
+          <p id="note-modal-title" class="text-xs text-slate-400 font-mono mt-0.5"></p>
+        </div>
+        <button onclick="closeNotesModal()" class="text-slate-400 hover:text-white text-lg font-mono leading-none">&times;</button>
+      </div>
+      <p class="text-[11px] text-slate-400 mb-2">Esta nota é estritamente sua e não pode ser vista pelos outros jogadores.</p>
+      <textarea 
+        id="note-text" 
+        rows="4" 
+        placeholder="Ex: Peguei na partida ranqueada do sábado; Combina bem com submetralhadora..." 
+        class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-xs text-slate-200 focus:outline-none focus:border-amber-400"
+      ></textarea>
+      <div class="mt-4 flex justify-end gap-2">
+        <button onclick="closeNotesModal()" class="px-3 py-1.5 text-xs rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300">Cancelar</button>
+        <button onclick="saveNote()" class="px-4 py-1.5 text-xs font-bold rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950">Salvar Anotação</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Criação Automática de Novo Elemental -->
+  <div id="new-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4" onclick="closeNewElementalModal()">
+    <div class="bg-slate-900 border border-slate-700 max-w-md w-full rounded-2xl p-6 shadow-2xl relative" onclick="event.stopPropagation()">
+      <div class="flex items-start justify-between gap-3 mb-4">
+        <h3 class="text-lg font-bold text-white font-gaming flex items-center gap-2">
+          <span>⚡</span> Cadastrar Novo Elemental
+        </h3>
+        <button onclick="closeNewElementalModal()" class="text-slate-400 hover:text-white text-lg font-mono leading-none">&times;</button>
+      </div>
+
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-mono text-slate-400 mb-1">Nome do Elemental:</label>
+          <input type="text" id="new-nome" placeholder="Ex: Elemental Fênix" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-400">
+        </div>
+
+        <div>
+          <label class="block text-xs font-mono text-slate-400 mb-1">Versão / Tipo:</label>
+          <select id="new-versao" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-400">
+            <option value="Normal">Normal</option>
+            <option value="Dourado">Dourado</option>
+            <option value="Trapaça">Trapaça</option>
+            <option value="Hacker">Hacker</option>
+            <option value="Caçador">Caçador</option>
+            <option value="Mítico">Mítico</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-mono text-slate-400 mb-1">Link da Imagem (URL ou caminho local):</label>
+          <input type="text" id="new-img" placeholder="Ex: img/Elemental-Fenix-Normal.jpeg ou https://..." class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-400">
+        </div>
+
+        <div>
+          <label class="block text-xs font-mono text-slate-400 mb-1">Descrição / Habilidade:</label>
+          <textarea id="new-desc" rows="3" placeholder="Descreva o poder concedido pelo espírito..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-cyan-400"></textarea>
+        </div>
+      </div>
+
+      <div class="mt-5 flex justify-end gap-2">
+        <button onclick="closeNewElementalModal()" class="px-3 py-1.5 text-xs rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300">Cancelar</button>
+        <button onclick="saveNewElemental()" class="px-4 py-1.5 text-xs font-bold rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950">Cadastrar no Sistema</button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
