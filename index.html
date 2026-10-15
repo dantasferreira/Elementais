@@ -32,7 +32,8 @@
   <!-- Firebase SDK -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, onValue, set, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+  import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+  import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAruvFG2YHwaEesq-izCzDBfNvmX9F-uC0",
@@ -47,10 +48,20 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
+    const auth = getAuth(app);
 
-    // Sistema de Usuário Individual
-    let currentUser = localStorage.getItem('fortnite_elementais_user') || 'Jogador1';
-    let currentListenerUnsubscribe = null;
+    // Autenticação anônima silenciosa
+    signInAnonymously(auth).catch((error) => {
+    console.error("Erro na autenticação anônima:", error);
+    });
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // O ID individual seguro do jogador
+        const secureUserId = user.uid;
+        setupUserListener(secureUserId);
+      }
+    });
 
     const IDS_OCULTOS = [5, 10, 15, 20, 25, 30, 35, 40, 45, 55, 60, 65, 67, 68, 69, 70, 75, 80, 85, 90, 95]; 
 
@@ -793,6 +804,5 @@
       </div>
     </div>
   </div>
-
 </body>
 </html>
