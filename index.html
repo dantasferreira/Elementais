@@ -19,6 +19,7 @@
     .badge-trapaca { background: rgba(168, 85, 247, 0.2); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.4); }
     .badge-hacker { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); }
     .badge-cacador { background: rgba(132, 112, 255, 0.2); color: #8470FF; border: 1px solid rgba(132, 112, 255, 0.4); }
+    .badge-travessura { background: rgba(236, 72, 153, 0.2); color: #f472b6; border: 1px solid rgba(236, 72, 153, 0.4); }
     .badge-mitico { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); }
 
     /* Efeito de Domínio (Coroa) */
@@ -32,8 +33,8 @@
   <!-- Firebase SDK -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-  import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAruvFG2YHwaEesq-izCzDBfNvmX9F-uC0",
@@ -50,18 +51,9 @@
     const db = getDatabase(app);
     const auth = getAuth(app);
 
-    // Autenticação anônima silenciosa
-    signInAnonymously(auth).catch((error) => {
-    console.error("Erro na autenticação anônima:", error);
-    });
-
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        // O ID individual seguro do jogador
-        const secureUserId = user.uid;
-        setupUserListener(secureUserId);
-      }
-    });
+    // Variáveis de identificação de usuário
+    let currentUid = null;
+    let currentNick = localStorage.getItem('fortnite_elementais_nick') || 'Jogador';
 
     const IDS_OCULTOS = [5, 10, 15, 20, 25, 30, 35, 40, 45, 55, 60, 65, 67, 68, 69, 70, 75, 80, 85, 90, 95]; 
 
@@ -94,117 +86,96 @@
       { tipo: "Dourado", badgeClass: "badge-dourado" },
       { tipo: "Trapaça", badgeClass: "badge-trapaca" },
       { tipo: "Hacker", badgeClass: "badge-hacker" },
-      { tipo: "Caçador", badgeClass: "badge-cacador" }
+      { tipo: "Caçador", badgeClass: "badge-cacador" },
+      { tipo: "Travessura", badgeClass: "badge-travessura" }
     ];
+
+    const imageMap = {
+      "Elemental Aventura-Normal": "img/Elemental-Aventura-Normal.jpeg",
+      "Elemental Aventura-Dourado": "img/Elemental-Aventura-Dourado.jpeg",
+      "Elemental Aventura-Trapaça": "img/Elemental-Aventura-Trapaça.jpeg",
+      "Elemental Guarda da Moita-Normal": "img/Elemental-Moita-Normal.jpeg",
+      "Elemental Guarda da Moita-Dourado": "img/Elemental-Moita-Dourado.jpeg",
+      "Elemental Guarda da Moita-Trapaça": "img/Elemental-Moita-Trapaça.jpeg",
+      "Elemental Jonesy-Normal": "img/Elemental-Jonesy-Normal.jpeg",
+      "Elemental Jonesy-Dourado": "img/Elemental-Jonesy-Dourado.jpeg",
+      "Elemental Jonesy-Trapaça": "img/Elemental-Jonesy-Trapaça.jpeg",
+      "Elemental Sonic-Normal": "img/Elemental-Sonic-Normal.jpeg",
+      "Elemental Sonic-Dourado": "img/Elemental-Sonic-Dourado.jpeg",
+      "Elemental Sonic-Trapaça": "img/Elemental-Sonic-Trapaça.jpeg",
+      "Elemental Tails-Normal": "img/Elemental-Tails-Normal.jpeg",
+      "Elemental Tails-Dourado": "img/Elemental-Tails-Dourado.jpeg",
+      "Elemental Tails-Trapaça": "img/Elemental-Tails-Trapaça.jpeg",
+      "Elemental Klimbo-Normal": "img/Elemental-Klimbo-Normal.jpeg",
+      "Elemental Klimbo-Dourado": "img/Elemental-Klimbo-Dourado.jpeg",
+      "Elemental Klimbo-Trapaça": "img/Elemental-Klimbo-Trapaça.jpeg",
+      "Elemental Jackrabbit-Normal": "img/Elemental-Jackrabbit-Normal.jpeg",
+      "Elemental Jackrabbit-Dourado": "img/Elemental-Jackrabbit-Dourado.jpeg",
+      "Elemental Jackrabbit-Trapaça": "img/Elemental-Jackrabbit-Trapaça.jpeg",
+      "Elemental 8-Bits-Normal": "img/Elemental-8-Bits-Normal.jpeg",
+      "Elemental 8-Bits-Dourado": "img/Elemental-8-Bits-Dourado.jpeg",
+      "Elemental 8-Bits-Trapaça": "img/Elemental-8-Bits-Trapaça.jpeg",
+      "Elemental Shadow-Normal": "img/Elemental-Shadow-Normal.jpeg",
+      "Elemental Shadow-Dourado": "img/Elemental-Shadow-Dourado.jpeg",
+      "Elemental Shadow-Trapaça": "img/Elemental-Shadow-Trapaça.jpeg",
+      "Elemental Coroa (Crown)-Normal": "img/Elemental-Coroa-Normal.jpeg",
+      "Elemental Coroa (Crown)-Dourado": "img/Elemental-Coroa-Dourado.jpeg",
+      "Elemental Coroa (Crown)-Trapaça": "img/Elemental-Coroa-Trapaça.jpeg",
+      "Elemental Coroa (Crown)-Caçador": "img/Elemental-Coroa-Cacador.jpeg",
+      "Elemental Disruptor-Normal": "img/Elemental-Disruptor-Normal.jpeg",
+      "Elemental Disruptor-Dourado": "img/Elemental-Disruptor-Dourado.jpeg",
+      "Elemental Disruptor-Trapaça": "img/Elemental-Disruptor-Trapaça.jpeg",
+      "Elemental Raio X-Normal": "img/Elemental-Raio-X-Normal.jpeg",
+      "Elemental Raio X-Dourado": "img/Elemental-Raio-X-Dourado.jpeg",
+      "Elemental Raio X-Trapaça": "img/Elemental-Raio-X-Trapaça.jpeg",
+      "Elemental Onigiri-Normal": "img/Elemental-Onigiri-Normal.jpeg",
+      "Elemental Onigiri-Dourado": "img/Elemental-Onigiri-Dourado.jpeg",
+      "Elemental Onigiri-Trapaça": "img/Elemental-Onigiri-Trapaça.jpeg",
+      "Elemental Mega Man-Normal": "img/Elemental-Mega-Man-Normal.jpeg",
+      "Elemental Sobreescudo-Normal": "img/Elemental-Sobreescudo-Normal.jpeg",
+      "Elemental Sobreescudo-Dourado": "img/Elemental-Sobreescudo-Dourado.jpeg",
+      "Elemental Sobreescudo-Trapaça": "img/Elemental-Sobreescudo-Trapaça.jpeg",
+      "Elemental Storm Scout-Normal": "img/Elemental-Storm-Scout-Normal.jpeg",
+      "Elemental Storm Scout-Dourado": "img/Elemental-Storm-Scout-Dourado.jpeg",
+      "Elemental Storm Scout-Trapaça": "img/Elemental-Storm-Scout-Trapaça.jpeg",
+      "Elemental Lagoa-Normal": "img/Elemental-Lagoa-Normal.jpeg",
+      "Elemental Lagoa-Dourado": "img/Elemental-Lagoa-Dourado.jpeg",
+      "Elemental Lagoa-Trapaça": "img/Elemental-Lagoa-Trapaça.jpeg",
+      "Elemental Blinky-Normal": "img/Elemental-Blinky-Normal.jpeg",
+      "Elemental Blinky-Dourado": "img/Elemental-Blinky-Dourado.jpeg",
+      "Elemental Blinky-Trapaça": "img/Elemental-Blinky-Trapaça.jpeg",
+      "Elemental Crash-Normal": "img/Elemental-Crash-Normal.jpeg",
+      "Elemental Crash-Dourado": "img/Elemental-Crash-Dourado.jpeg",
+      "Elemental Crash-Trapaça": "img/Elemental-Crash-Trapaça.jpeg",
+      "Elemental Morgana-Normal": "img/Elemental-Morgana-Normal.jpeg",
+      "Elemental Morgana-Dourado": "img/Elemental-Morgana-Dourado.jpeg",
+      "Elemental Morgana-Trapaça": "img/Elemental-Morgana-Trapaca.jpeg",
+      "Elemental Morgana-Hacker": "img/Elemental-Morgana-Hacker.jpeg",
+      "Elemental Morgana-Caçador": "img/Elemental-Morgana-Cacador.jpeg",
+      "Elemental Aniversário-Normal": "img/Elemental-aniversario-Normal.jpeg",
+      "Elemental Aniversário-Dourado": "img/Elemental-aniversario-Dourado.jpeg",
+      "Elemental Aniversário-Trapaça": "img/Elemental-aniversario-Trapaca.jpeg",
+      "Elemental Aniversário-Hacker": "img/Elemental-aniversario-Hacker.jpeg",
+      "Elemental Aniversário-Caçador": "img/Elemental-aniversario-Cacador.jpeg"
+    };
 
     let elementaisData = [];
     let counter = 1;
 
     baseElementais.forEach((el) => {
       tipos.forEach((t) => {
+        const key = `${el.nome}-${t.tipo}`;
         elementaisData.push({
           id: counter,
           nome: el.nome,
           descricao: el.desc,
           versao: t.tipo,
           badgeClass: t.badgeClass,
-          img: "",
+          img: imageMap[key] || "",
           hidden: IDS_OCULTOS.includes(counter)
         });
         counter++;
       });
-    });
-
-    // Imagens Base pré-configuradas
-    const preImgs = {
-      0: "img/Elemental-Aventura-Normal.jpeg",
-      1: "img/Elemental-Aventura-Dourado.jpeg",
-      2: "img/Elemental-Aventura-Trapaça.jpeg",
-      3: "img/Elemental-Aventura-Mítico.jpeg",
-      5: "img/Elemental-Moita-Normal.jpeg",
-      6: "img/Elemental-Moita-Dourado.jpeg",
-      7: "img/Elemental-Moita-Trapaça.jpeg",
-      8: "img/Elemental-Moita-Mítico.jpeg",
-      10: "img/Elemental-Jonesy-Normal.jpeg",
-      11: "img/Elemental-Jonesy-Dourado.jpeg",
-      12: "img/Elemental-Jonesy-Trapaça.jpeg",
-      13: "img/Elemental-Jonesy-Mítico.jpeg",
-      15: "img/Elemental-Sonic-Normal.jpeg",
-      16: "img/Elemental-Sonic-Dourado.jpeg",
-      17: "img/Elemental-Sonic-Trapaça.jpeg",
-      18: "img/Elemental-Sonic-Mítico.jpeg",
-      20: "img/Elemental-Tails-Normal.jpeg",
-      21: "img/Elemental-Tails-Dourado.jpeg",
-      22: "img/Elemental-Tails-Trapaça.jpeg",
-      23: "img/Elemental-Tails-Mítico.jpeg",
-      25: "img/Elemental-Klimbo-Normal.jpeg",
-      26: "img/Elemental-Klimbo-Dourado.jpeg",
-      27: "img/Elemental-Klimbo-Trapaça.jpeg",
-      28: "img/Elemental-Klimbo-Mítico.jpeg",
-      30: "img/Elemental-Jackrabbit-Normal.jpeg",
-      31: "img/Elemental-Jackrabbit-Dourado.jpeg",
-      32: "img/Elemental-Jackrabbit-Trapaça.jpeg",
-      33: "img/Elemental-Jackrabbit-Mítico.jpeg",
-      35: "img/Elemental-8-Bits-Normal.jpeg",
-      36: "img/Elemental-8-Bits-Dourado.jpeg",
-      37: "img/Elemental-8-Bits-Trapaça.jpeg",
-      38: "img/Elemental-8-Bits-Mítico.jpeg",
-      40: "img/Elemental-Shadow-Normal.jpeg",
-      41: "img/Elemental-Shadow-Dourado.jpeg",
-      42: "img/Elemental-Shadow-Trapaça.jpeg",
-      43: "img/Elemental-Shadow-Mítico.jpeg",
-      45: "img/Elemental-Coroa-Normal.jpeg",
-      46: "img/Elemental-Coroa-Dourado.jpeg",
-      47: "img/Elemental-Coroa-Trapaça.jpeg",
-      48: "img/Elemental-Coroa-Mítico.jpeg",
-      49: "img/Elemental-Coroa-Cacador.jpeg",
-      50: "img/Elemental-Disruptor-Normal.jpeg",
-      51: "img/Elemental-Disruptor-Dourado.jpeg",
-      52: "img/Elemental-Disruptor-Trapaça.jpeg",
-      53: "img/Elemental-Disruptor-Mítico.jpeg",
-      55: "img/Elemental-Raio-X-Normal.jpeg",
-      56: "img/Elemental-Raio-X-Dourado.jpeg",
-      57: "img/Elemental-Raio-X-Trapaça.jpeg",
-      58: "img/Elemental-Raio-X-Mítico.jpeg",
-      60: "img/Elemental-Onigiri-Normal.jpeg",
-      61: "img/Elemental-Onigiri-Dourado.jpeg",
-      62: "img/Elemental-Onigiri-Trapaça.jpeg",
-      63: "img/Elemental-Onigiri-Mítico.jpeg",
-      65: "img/Elemental-Mega-Man-Normal.jpeg",
-      70: "img/Elemental-Sobreescudo-Normal.jpeg",
-      71: "img/Elemental-Sobreescudo-Dourado.jpeg",
-      72: "img/Elemental-Sobreescudo-Trapaça.jpeg",
-      73: "img/Elemental-Sobreescudo-Mítico.jpeg",
-      75: "img/Elemental-Storm-Scout-Normal.jpeg",
-      76: "img/Elemental-Storm-Scout-Dourado.jpeg",
-      77: "img/Elemental-Storm-Scout-Trapaça.jpeg",
-      78: "img/Elemental-Storm-Scout-Mítico.jpeg",
-      80: "img/Elemental-Lagoa-Normal.jpeg",
-      81: "img/Elemental-Lagoa-Dourado.jpeg",
-      82: "img/Elemental-Lagoa-Trapaça.jpeg",
-      83: "img/Elemental-Lagoa-Mítico.jpeg",
-      85: "img/Elemental-Blinky-Normal.jpeg",
-      86: "img/Elemental-Blinky-Dourado.jpeg",
-      87: "img/Elemental-Blinky-Trapaça.jpeg",
-      88: "img/Elemental-Blinky-Mítico.jpeg",
-      90: "img/Elemental-Crash-Normal.jpeg",
-      91: "img/Elemental-Crash-Dourado.jpeg",
-      92: "img/Elemental-Crash-Trapaça.jpeg",
-      93: "img/Elemental-Crash-Mítico.jpeg",
-      95: "img/Elemental-Morgana-Normal.jpeg",
-      96: "img/Elemental-Morgana-Dourado.jpeg",
-      97: "img/Elemental-Morgana-Trapaca.jpeg",
-      98: "img/Elemental-Morgana-Hacker.jpeg",
-      99: "img/Elemental-Morgana-Cacador.jpeg",
-      100: "img/Elemental-aniversario-Normal.jpeg",
-      101: "img/Elemental-aniversario-Dourado.jpeg",
-      102: "img/Elemental-aniversario-Trapaca.jpeg",
-      103: "img/Elemental-aniversario-Hacker.jpeg",
-      104: "img/Elemental-aniversario-Cacador.jpeg"
-    };
-
-    Object.keys(preImgs).forEach(idx => {
-      if (elementaisData[idx]) elementaisData[idx].img = preImgs[idx];
     });
 
     let currentFilter = 'all';
@@ -236,7 +207,7 @@
       `;
 
       const imgElement = isValidImg 
-        ? `<img src="${item.img}" alt="${item.nome} ${item.versao}" class="w-full h-24 object-contain rounded-lg mb-2 p-1 bg-slate-950 border border-slate-800">`
+        ? `<img src="${item.img}" alt="${item.nome} ${item.versao}" class="w-full h-24 object-contain rounded-lg mb-2 p-1 bg-slate-950 border border-slate-800" onerror="this.outerHTML='${imgPlaceholder.replace(/'/g, "\\'")}'">`
         : imgPlaceholder;
 
       card.innerHTML = `
@@ -257,13 +228,11 @@
         </div>
 
         <div class="mt-3 flex items-center justify-between gap-1 pt-2 border-t border-slate-800/80">
-          <!-- Info de Habilidade -->
           <button type="button" onclick="showModal(${item.id})" class="text-slate-400 hover:text-cyan-400 p-1 rounded-md text-xs flex items-center gap-1 transition-colors" title="Ver Habilidade">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path stroke-width="2" d="M12 16v-4m0-4h.01"/></svg>
             <span class="text-[10px] hidden sm:inline">Info</span>
           </button>
 
-          <!-- Anotação Pessoal / Secreta -->
           <button type="button" onclick="openNotesModal(${item.id})" class="text-slate-400 hover:text-amber-300 p-1 rounded-md text-xs flex items-center gap-0.5 transition-colors" title="Minhas Anotações Secretas">
             <span class="text-xs">📝</span>
             <span id="note-indicator-${item.id}" class="w-1.5 h-1.5 rounded-full bg-amber-400 hidden"></span>
@@ -294,10 +263,9 @@
       `;
     }
 
-    // Renderiza a lista inicial
     elementaisData.forEach(item => renderCard(item));
 
-    // Escuta Elementais criados dinamicamente via Firebase
+    // Elementais personalizados compartilhados
     const customRef = ref(db, 'custom_elementais');
     onValue(customRef, (snapshot) => {
       const customs = snapshot.val() || {};
@@ -430,36 +398,42 @@
       applyFilters();
     }
 
-    // Configura ou alterna o perfil de usuário ativo
-    function setupUserListener(username) {
-      currentUser = username.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '') || 'jogador1';
-      localStorage.setItem('fortnite_elementais_user', currentUser);
-      document.getElementById('current-username-display').innerText = currentUser.toUpperCase();
-      document.getElementById('user-input').value = currentUser;
+    // Inicialização da Autenticação Anônima
+    signInAnonymously(auth).catch((error) => {
+      console.error("Erro na autenticação anônima:", error);
+    });
 
-      const userRef = ref(db, `user_data/${currentUser}`);
-      onValue(userRef, (snapshot) => {
-        userState = snapshot.val() || {};
-        updateUserView();
-      });
-    }
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        currentUid = user.uid;
+        document.getElementById('current-username-display').innerText = currentNick.toUpperCase();
+        document.getElementById('user-input').value = currentNick;
 
-    // Inicializa com o usuário atual
-    setupUserListener(currentUser);
+        // Escuta os dados isolados pelo UID de autenticação
+        const userRef = ref(db, `user_data/${currentUid}`);
+        onValue(userRef, (snapshot) => {
+          userState = snapshot.val() || {};
+          updateUserView();
+        });
+      }
+    });
 
     // Controles Globais
     window.changeUser = () => {
-      const inputVal = document.getElementById('user-input').value;
-      if (!inputVal.trim()) return;
-      setupUserListener(inputVal);
+      const inputVal = document.getElementById('user-input').value.trim();
+      if (!inputVal) return;
+      currentNick = inputVal;
+      localStorage.setItem('fortnite_elementais_nick', currentNick);
+      document.getElementById('current-username-display').innerText = currentNick.toUpperCase();
     };
 
     window.toggleItem = (id) => {
+      if (!currentUid) return;
       const status = getItemStatus(id);
       const newCaptured = !status.captured;
       const newCrowned = newCaptured ? status.crowned : false;
       
-      set(ref(db, `user_data/${currentUser}/${id}`), {
+      set(ref(db, `user_data/${currentUid}/${id}`), {
         captured: newCaptured,
         crowned: newCrowned,
         note: status.note || ''
@@ -467,18 +441,18 @@
     };
 
     window.toggleCrown = (id) => {
+      if (!currentUid) return;
       const status = getItemStatus(id);
       const newCrowned = !status.crowned;
       const newCaptured = newCrowned ? true : status.captured;
 
-      set(ref(db, `user_data/${currentUser}/${id}`), {
+      set(ref(db, `user_data/${currentUid}/${id}`), {
         captured: newCaptured,
         crowned: newCrowned,
         note: status.note || ''
       });
     };
 
-    // Modal de Anotações Individuais
     let currentNoteId = null;
     window.openNotesModal = (id) => {
       currentNoteId = id;
@@ -491,11 +465,11 @@
     };
 
     window.saveNote = () => {
-      if (!currentNoteId) return;
+      if (!currentNoteId || !currentUid) return;
       const text = document.getElementById('note-text').value;
       const status = getItemStatus(currentNoteId);
 
-      set(ref(db, `user_data/${currentUser}/${currentNoteId}`), {
+      set(ref(db, `user_data/${currentUid}/${currentNoteId}`), {
         captured: status.captured,
         crowned: status.crowned,
         note: text
@@ -508,7 +482,6 @@
       currentNoteId = null;
     };
 
-    // Modal de Cadastro de Novo Elemental
     window.openNewElementalModal = () => {
       document.getElementById('new-modal').classList.remove('hidden');
     };
@@ -528,7 +501,6 @@
         return;
       }
 
-      // Calcula o próximo ID sequencial
       const maxId = elementaisData.reduce((max, item) => Math.max(max, item.id), 0);
       const newId = maxId + 1;
 
@@ -538,6 +510,7 @@
         "Trapaça": "badge-trapaca",
         "Hacker": "badge-hacker",
         "Caçador": "badge-cacador",
+        "Travessura": "badge-travessura",
         "Mítico": "badge-mitico"
       };
 
@@ -551,7 +524,6 @@
         hidden: false
       };
 
-      // Salva no nó compartilhado de elementais personalizados
       set(ref(db, `custom_elementais/${newId}`), newItem).then(() => {
         closeNewElementalModal();
         document.getElementById('new-nome').value = '';
@@ -612,13 +584,13 @@
       <div>
         <div class="flex items-center gap-3 mb-1">
           <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span class="text-xs font-mono uppercase tracking-widest text-slate-400">Painel Individual Privado</span>
+          <span class="text-xs font-mono uppercase tracking-widest text-slate-400">Autenticado & Seguro</span>
           <span class="text-xs font-mono px-2 py-0.5 rounded bg-cyan-950 border border-cyan-500/40 text-cyan-300 font-bold" id="current-username-display">JOGADOR</span>
         </div>
         <h1 class="text-2xl sm:text-3xl font-bold font-gaming text-white tracking-wide">
           ESPÍRITOS ELEMENTAIS // <span class="text-cyan-400">FORTNITE</span>
         </h1>
-        <p class="text-sm text-slate-400 mt-1">Anotações e capturas individuais com cadastro dinâmico em tempo real.</p>
+        <p class="text-sm text-slate-400 mt-1">Checklist individual e isolado com autenticação segura no Firebase.</p>
       </div>
 
       <!-- Barra de Progresso Global do Jogador -->
@@ -640,9 +612,8 @@
 
     <!-- Barra de Perfil & Adicionar Elemental -->
     <div class="mb-4 flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-900/60 p-3 rounded-xl border border-slate-800">
-      <!-- Seletor de Perfil Privado -->
       <div class="flex items-center gap-2 w-full sm:w-auto">
-        <span class="text-xs font-mono text-slate-400">Meu Perfil:</span>
+        <span class="text-xs font-mono text-slate-400">Meu Nick:</span>
         <input 
           type="text" 
           id="user-input" 
@@ -653,11 +624,10 @@
           onclick="changeUser()" 
           class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs rounded-lg border border-slate-700 transition-colors"
         >
-          Trocar
+          Salvar
         </button>
       </div>
 
-      <!-- Botão para Cadastrar Novo Elemental Instantaneamente -->
       <button 
         onclick="openNewElementalModal()" 
         class="w-full sm:w-auto px-4 py-1.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 text-xs font-bold rounded-lg flex items-center justify-center gap-1.5 shadow-lg shadow-cyan-950/50 transition-all"
@@ -704,7 +674,6 @@
       </div>
     </div>
 
-    <!-- Mensagem de lista vazia -->
     <div id="empty-msg" class="hidden text-center py-16 text-slate-500 bg-slate-900/20 rounded-2xl border border-dashed border-slate-800">
       <p class="text-sm">Nenhum elemental corresponde aos filtros aplicados.</p>
     </div>
@@ -783,6 +752,7 @@
             <option value="Trapaça">Trapaça</option>
             <option value="Hacker">Hacker</option>
             <option value="Caçador">Caçador</option>
+            <option value="Travessura">Travessura</option>
             <option value="Mítico">Mítico</option>
           </select>
         </div>
@@ -804,5 +774,6 @@
       </div>
     </div>
   </div>
+
 </body>
 </html>
