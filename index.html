@@ -17,13 +17,13 @@
     .font-gaming { font-family: 'Chakra Petch', sans-serif; }
     
     /* Cores das variações */
-    .badge-normal { background: rgba(59, 130, 246, 0.18); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.45); }
-    .badge-dourado { background: rgba(234, 179, 8, 0.18); color: #fde047; border: 1px solid rgba(234, 179, 8, 0.45); }
-    .badge-trapaca { background: rgba(168, 85, 247, 0.18); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.45); }
-    .badge-hacker { background: rgba(239, 68, 68, 0.18); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.45); }
-    .badge-cacador { background: rgba(132, 112, 255, 0.18); color: #a5b4fc; border: 1px solid rgba(132, 112, 255, 0.45); }
-    .badge-travessura { background: rgba(236, 72, 153, 0.18); color: #f472b6; border: 1px solid rgba(236, 72, 153, 0.45); }
-    .badge-pato { background: rgba(251, 146, 60, 0.18); color: #fdba74; border: 1px solid rgba(251, 146, 60, 0.45); }
+    .normal { background: rgba(59, 130, 246, 0.18); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.45); }
+    .dourado { background: rgba(234, 179, 8, 0.18); color: #fde047; border: 1px solid rgba(234, 179, 8, 0.45); }
+    .trapaca { background: rgba(168, 85, 247, 0.18); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.45); }
+    .hacker { background: rgba(239, 68, 68, 0.18); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.45); }
+    .cacador { background: rgba(132, 112, 255, 0.18); color: #a5b4fc; border: 1px solid rgba(132, 112, 255, 0.45); }
+    .travessura { background: rgba(236, 72, 153, 0.18); color: #f472b6; border: 1px solid rgba(236, 72, 153, 0.45); }
+    .pato { background: rgba(251, 146, 60, 0.18); color: #fdba74; border: 1px solid rgba(251, 146, 60, 0.45); }
 
     /* Efeito de Domínio (Coroa) */
     .card-crowned {
@@ -101,7 +101,7 @@
     const tipos = [
       { tipo: "Normal", badgeClass: "normal" },
       { tipo: "Dourado", badgeClass: "dourado" },
-      { tipo: "Trapaça", badgeClass: "badge-trapaca" },
+      { tipo: "Trapaça", badgeClass: "trapaca" },
       { tipo: "Hacker", badgeClass: "hacker" },
       { tipo: "Caçador", badgeClass: "cacador" },
       { tipo: "Travessura", badgeClass: "travessura" },
@@ -619,13 +619,13 @@
       const newId = maxId + 1;
 
       const badgeMap = {
-        "Normal": "badge-normal",
-        "Dourado": "badge-dourado",
-        "Trapaça": "badge-trapaca",
-        "Hacker": "badge-hacker",
-        "Caçador": "badge-cacador",
-        "Travessura": "badge-travessura",
-        "Pato": "badge-pato"
+        "Normal": "normal",
+        "Dourado": "dourado",
+        "Trapaça": "trapaca",
+        "Hacker": "hacker",
+        "Caçador": "cacador",
+        "Travessura": "travessura",
+        "Pato": "pato"
       };
 
       const newItem = {
@@ -633,7 +633,7 @@
         nome: nome.startsWith("Elemental") ? nome : `Elemental ${nome}`,
         descricao: desc || "Habilidade não informada.",
         versao: versao,
-        badgeClass: badgeMap[versao] || "badge-normal",
+        badgeClass: badgeMap[versao] || "normal",
         img: img || "#",
         hidden: false
       };
