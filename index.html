@@ -3,43 +3,245 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rastreador de Elementais - Fortnite</title>
+  <title>Espíritos Elementais // Fortnite Tracker</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@1,700;1,800;1,900&family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
-    body { 
-      font-family: 'Inter', sans-serif; 
-      background-color: #060913;
+    :root {
+      --bg: #070a1c;
+      --cyan: #22d3ee;
+      --violet: #8b5cf6;
+      --gold: #fbbf24;
     }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg);
+      background-image:
+        radial-gradient(ellipse 80% 50% at 15% -10%, rgba(139, 92, 246, 0.35), transparent 60%),
+        radial-gradient(ellipse 70% 50% at 100% 0%, rgba(34, 211, 238, 0.22), transparent 60%),
+        radial-gradient(ellipse 60% 40% at 50% 110%, rgba(236, 72, 153, 0.15), transparent 60%);
+      background-attachment: fixed;
+      overflow-x: hidden;
+    }
+    /* Grade holográfica de fundo */
+    body::before {
+      content: "";
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(34, 211, 238, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(34, 211, 238, 0.05) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+      -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+    }
+    body::after {
+      content: "";
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background: repeating-linear-gradient(0deg, rgba(255,255,255,0.018) 0, rgba(255,255,255,0.018) 1px, transparent 1px, transparent 3px);
+    }
+    .relative-layer { position: relative; z-index: 1; }
+
     .font-gaming { font-family: 'Chakra Petch', sans-serif; }
-    
-    /* Cores das variações */
-    .normal { background: rgba(59, 130, 246, 0.18); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.45); }
-    .dourado { background: rgba(234, 179, 8, 0.18); color: #fde047; border: 1px solid rgba(234, 179, 8, 0.45); }
-    .trapaca { background: rgba(168, 85, 247, 0.18); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.45); }
-    .hacker { background: rgba(239, 68, 68, 0.18); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.45); }
-    .cacador { background: rgba(132, 112, 255, 0.18); color: #a5b4fc; border: 1px solid rgba(132, 112, 255, 0.45); }
-    .travessura { background: rgba(236, 72, 153, 0.18); color: #f472b6; border: 1px solid rgba(236, 72, 153, 0.45); }
-    .pato { background: rgba(251, 146, 60, 0.18); color: #fdba74; border: 1px solid rgba(251, 146, 60, 0.45); }
+    .font-fn {
+      font-family: 'Barlow Condensed', 'Chakra Petch', sans-serif;
+      font-style: italic; font-weight: 900; text-transform: uppercase; letter-spacing: 0.02em;
+    }
+    .is-hidden { display: none !important; }
 
-    /* Efeito de Domínio (Coroa) */
-    .card-crowned {
-      border-color: rgba(245, 158, 11, 0.85) !important;
-      background: radial-gradient(circle at 50% 0%, rgba(245, 158, 11, 0.18), rgba(15, 23, 42, 0.95)) !important;
-      box-shadow: 0 0 20px rgba(245, 158, 11, 0.3), inset 0 0 15px rgba(245, 158, 11, 0.08);
+    /* Cortes angulares estilo HUD */
+    .clip-hud {
+      clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+    }
+    .clip-btn {
+      clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
     }
 
-    /* Card Glow Hover */
-    .card-base {
-      transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Painéis de vidro */
+    .panel {
+      background: linear-gradient(145deg, rgba(20, 24, 56, 0.82), rgba(10, 13, 34, 0.82));
+      border: 1px solid rgba(99, 102, 241, 0.28);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
     }
-    .card-base:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 25px -5px rgba(6, 182, 212, 0.15);
+
+    /* Variações = cores de raridade */
+    .v-normal     { --c: 59, 130, 246; }
+    .v-dourado    { --c: 250, 204, 21; }
+    .v-trapaca    { --c: 168, 85, 247; }
+    .v-hacker     { --c: 239, 68, 68; }
+    .v-cacador    { --c: 129, 140, 248; }
+    .v-travessura { --c: 236, 72, 153; }
+    .v-pato       { --c: 251, 146, 60; }
+
+    .tag {
+      background: rgba(var(--c), 0.18);
+      color: rgb(var(--c));
+      border: 1px solid rgba(var(--c), 0.55);
+      text-shadow: 0 0 8px rgba(var(--c), 0.6);
     }
+
+    /* Card */
+    .card {
+      position: relative;
+      display: flex; flex-direction: column; justify-content: space-between;
+      min-width: 0;
+      padding: 10px;
+      background: linear-gradient(160deg, rgba(var(--c), 0.14), rgba(9, 12, 32, 0.92) 55%);
+      border: 1px solid rgba(var(--c), 0.35);
+      clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+      transition: transform .2s ease, filter .2s ease, border-color .2s ease;
+    }
+    .card::before {
+      content: ""; position: absolute; left: 0; top: 0; height: 3px; width: 100%;
+      background: linear-gradient(90deg, rgb(var(--c)), transparent);
+      opacity: .9;
+    }
+    .card:hover { transform: translateY(-4px); filter: drop-shadow(0 8px 14px rgba(var(--c), .35)); }
+
+    .card.owned {
+      background: linear-gradient(160deg, rgba(16, 185, 129, 0.2), rgba(9, 12, 32, 0.92) 60%);
+      border-color: rgba(52, 211, 153, 0.6);
+    }
+    .card.crowned {
+      background: radial-gradient(circle at 50% 0%, rgba(251, 191, 36, 0.28), rgba(15, 18, 40, 0.95) 70%);
+      border-color: rgba(251, 191, 36, 0.9);
+      animation: crownPulse 2.6s ease-in-out infinite;
+    }
+    @keyframes crownPulse {
+      0%, 100% { filter: drop-shadow(0 0 6px rgba(251,191,36,.35)); }
+      50%      { filter: drop-shadow(0 0 16px rgba(251,191,36,.65)); }
+    }
+
+    /* Imagem */
+    .img-box {
+      position: relative; width: 100%; aspect-ratio: 1 / 1;
+      display: flex; align-items: center; justify-content: center;
+      background:
+        radial-gradient(circle at 50% 35%, rgba(var(--c), 0.28), transparent 65%),
+        rgba(4, 6, 18, 0.85);
+      border: 1px solid rgba(var(--c), 0.25);
+      overflow: hidden;
+    }
+    .img-box img {
+      width: 100%; height: 100%; object-fit: contain; padding: 4px;
+      opacity: 0; transform: scale(.94);
+      transition: opacity .35s ease, transform .35s ease;
+    }
+    .img-box img.loaded { opacity: 1; transform: scale(1); }
+    .img-box.loading::after {
+      content: ""; position: absolute; inset: 0;
+      background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,.08) 50%, transparent 70%);
+      background-size: 200% 100%;
+      animation: shimmer 1.2s linear infinite;
+    }
+    @keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+    .no-img {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      color: rgba(148, 163, 184, .55);
+      font-family: 'Chakra Petch', sans-serif; font-size: 9px; letter-spacing: .12em; text-transform: uppercase;
+    }
+    .no-img span.icon { font-size: 26px; opacity: .5; filter: grayscale(1); }
+
+    /* Botões de ação — tamanho fixo, nunca quebram */
+    .act {
+      flex: 0 0 auto;
+      width: 32px; height: 32px;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 14px; line-height: 1;
+      background: rgba(5, 8, 24, 0.85);
+      border: 1px solid rgba(100, 116, 139, 0.5);
+      color: #94a3b8;
+      cursor: pointer;
+      transition: all .15s ease;
+      clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
+    }
+    .act:hover { color: #fff; border-color: var(--cyan); background: rgba(34, 211, 238, .15); }
+    .act:active { transform: scale(.92); }
+    .act.crown-on { background: linear-gradient(135deg, #f59e0b, #fde047); color: #1c1203; border-color: #fde68a; box-shadow: 0 0 12px rgba(251,191,36,.6); }
+    .act.crown:hover { color: var(--gold); border-color: var(--gold); background: rgba(251,191,36,.15); }
+    .act.check { color: transparent; font-weight: 900; }
+    .act.check:hover { color: rgba(52,211,153,.5); border-color: #34d399; background: rgba(52,211,153,.12); }
+    .act.check-on { background: linear-gradient(135deg, #10b981, #34d399); color: #022c22; border-color: #6ee7b7; box-shadow: 0 0 12px rgba(16,185,129,.55); }
+    .act.note-on { color: var(--gold); border-color: rgba(251,191,36,.6); }
+
+    .card-foot {
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+      gap: 6px; margin-top: 10px; padding-top: 8px;
+      border-top: 1px dashed rgba(148, 163, 184, .2);
+    }
+    .card-foot .grp { display: flex; gap: 4px; flex-wrap: nowrap; }
+
+    /* Badge dominado */
+    .crown-badge {
+      position: absolute; top: 4px; right: 4px; z-index: 5;
+      background: linear-gradient(90deg, #f59e0b, #fde047); color: #1c1203;
+      padding: 2px 6px; font-size: 9px; font-weight: 900; letter-spacing: .06em;
+      font-family: 'Chakra Petch', sans-serif;
+      clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
+    }
+
+    /* Grid responsivo — nada estoura ao expandir a página */
+    #grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
+      gap: 14px;
+    }
+    @media (max-width: 420px) {
+      #grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    }
+
+    /* Botão de filtro */
+    .fbtn {
+      display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+      padding: 7px 16px;
+      font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 12px; letter-spacing: .06em; text-transform: uppercase;
+      background: rgba(15, 20, 50, .85); color: #cbd5e1;
+      border: 1px solid rgba(99,102,241,.35);
+      clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+      transition: all .15s ease; cursor: pointer;
+    }
+    .fbtn:hover { color: #fff; background: rgba(34,211,238,.12); }
+    .fbtn.active { background: linear-gradient(90deg, #06b6d4, #22d3ee); color: #04141c; border-color: #67e8f9; box-shadow: 0 0 16px rgba(34,211,238,.4); }
+    .fbtn.active.gold { background: linear-gradient(90deg, #f59e0b, #fde047); color: #1c1203; border-color: #fde68a; box-shadow: 0 0 16px rgba(251,191,36,.4); }
+    .fbtn .n { background: rgba(0,0,0,.3); padding: 0 6px; font-size: 10px; font-family: monospace; }
+
+    .btn-main {
+      font-family: 'Chakra Petch', sans-serif; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+      background: linear-gradient(90deg, #7c3aed, #22d3ee); color: #fff;
+      padding: 8px 18px; font-size: 12px; cursor: pointer;
+      clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+      transition: filter .15s, transform .15s;
+    }
+    .btn-main:hover { filter: brightness(1.15); transform: translateY(-1px); }
+    .btn-ghost {
+      font-family: 'Chakra Petch', sans-serif; font-weight: 600; letter-spacing: .05em; text-transform: uppercase;
+      background: rgba(30, 41, 59, .9); color: #cbd5e1; border: 1px solid rgba(100,116,139,.5);
+      padding: 7px 16px; font-size: 12px; cursor: pointer;
+      clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+      transition: background .15s;
+    }
+    .btn-ghost:hover { background: rgba(51, 65, 85, .95); }
+
+    .field {
+      width: 100%; background: rgba(4, 6, 20, .9); color: #fff;
+      border: 1px solid rgba(99,102,241,.35); padding: 8px 12px; font-size: 13px;
+      outline: none; transition: border-color .15s, box-shadow .15s;
+    }
+    .field:focus { border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(34,211,238,.15); }
+
+    .modal-wrap { animation: fadeIn .18s ease; }
+    .modal-box { animation: pop .22s cubic-bezier(.2, .9, .3, 1.2); }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes pop { from { transform: scale(.9) translateY(10px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+    ::-webkit-scrollbar { width: 10px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #070a1c; }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(#7c3aed, #22d3ee); border-radius: 6px; }
   </style>
 
   <!-- Firebase SDK -->
@@ -66,226 +268,92 @@
     let currentUid = null;
     let currentNick = localStorage.getItem('fortnite_elementais_nick') || 'Jogador';
 
-    const IDS_OCULTOS = [28,35,63,56,49,70,77,84,91,93,94,95,96,97,98,105,112,119,126,133,140,147,175,182,189,161,154]; 
+    const IDS_OCULTOS = [28,35,63,56,49,70,77,84,91,93,94,95,96,97,98,105,112,119,126,133,140,147,175,182,189,161,154];
 
+    // `img` = prefixo do nome do arquivo na pasta /img  (ex.: Elemental-Moita-Normal.jpeg)
     const baseElementais = [
-      { nome: "Elemental Aventura", desc: "Melhora aleatoriamente a raridade de um item do inventário a cada nível ganho." },
-      { nome: "Elemental Guarda da Moita", desc: "Cria um arbusto ao seu redor periodicamente; gera uma moita ao ser eliminado no nível máximo." },
-      { nome: "Elemental Jonesy", desc: "Restaura parte de sua vida ou escudo logo após você receber dano de oponentes." },
-      { nome: "Elemental Sonic", desc: "Concede bônus de velocidade e aceleração ao jogador." },
-      { nome: "Elemental Tails", desc: "Permite planar e ganhar mobilidade vertical avançada." },
-      { nome: "Elemental Klimbo", desc: "Pequena criatura baseada no clássico dinossauro do jogo." },
-      { nome: "Elemental Jackrabbit", desc: "Focado em agilidade e saltos." },
-      { nome: "Elemental 8-Bits", desc: "Estética retrô pixelada." },
-      { nome: "Elemental Shadow", desc: "Concede camuflagem e bônus de movimentação furtiva." },
-      { nome: "Elemental Coroa (Crown)", desc: "Relacionado a bônus de vitórias consecutivas." },
-      { nome: "Elemental Disruptor", desc: "Interfere com aparelhos e radares inimigos." },
-      { nome: "Elemental Raio X", desc: "Marca inimigos periodicamente em uma área ao seu redor (o raio e a frequência aumentam a cada nível)." },
-      { nome: "Elemental Onigiri", desc: "Aplica o efeito Sobrecarga após consumir qualquer item de cura ou escudo." },
-      { nome: "Elemental Mega Man", desc: "Reduz o atrito ao deslizar, permitindo que você deslize muito mais longe." },
-      { nome: "Elemental Sobreescudo", desc: "Concede e regenera uma camada extra de Sobrescudo para o jogador." },
-      { nome: "Elemental Storm Scout", desc: "Nova criatura da Tempestade." },
-      { nome: "Elemental Lagoa", desc: "Salto carregado mais alto." },
-      { nome: "Elemental Blinky", desc: "Invisivel por alguns segundo ao receber dano." },
-      { nome: "Elemental Crash", desc: "Ao saltar, gira e da dano circular ao redor." },
-      { nome: "Elemental Morgana", desc: "Aumenta a eficácia dos itens de cura" },
-      { nome: "Elemental Aniversário", desc: "Abrir baús tem uma chance de gerar um pedaço de bolo. Eliminações podem gerar bolo no nível máximo." },
-      { nome: "Elemental Salgueiro dos Desejos", desc: "Ao eliminar outros jogadores, extraia os Sprites que eles estiverem equipando. Afaste tudo ao sofrer dano. Fica irritado ao ser removido e marca você no mapa." },
-      { nome: "Elemental Mel", desc: "Chance de gerar abelhas no local do acerto ao causar dano com uma arma de longo alcance" },
-      { nome: "Elemental Corrida Assustadora", desc: "(Ativa - Salto no Ar) Spooky Dash permite atravessar certos objetos. Acumule cargas com o passar do tempo. O tempo de recarga das cargas diminui a cada subida de nível!" },
-      { nome: "Elemental Vampiro", desc: "Recupere vida ao causar dano a um inimigo. A porcentagem de vida recuperada aumenta a cada subida de nível!" },
-      { nome: "Elemental Espírito do Cervo", desc: "Ataques corpo a corpo causam mais dano. O dano de ataques corpo a corpo aumenta a cada subida de nível!" },
-      { nome: "Elemental Mergulho no Lixo", desc: "Comida concede cura adicional. Encontre comida ao sair de objetos nos quais você estava escondido, ou, com uma pequena chance, ao abrir recipientes. Encontre comidas melhores a cada subida de nível!" }
+      { nome: "Elemental Aventura", img: "Aventura", desc: "Melhora aleatoriamente a raridade de um item do inventário a cada nível ganho." },
+      { nome: "Elemental Guarda da Moita", img: "Moita", desc: "Cria um arbusto ao seu redor periodicamente; gera uma moita ao ser eliminado no nível máximo." },
+      { nome: "Elemental Jonesy", img: "Jonesy", desc: "Restaura parte de sua vida ou escudo logo após você receber dano de oponentes." },
+      { nome: "Elemental Sonic", img: "Sonic", desc: "Concede bônus de velocidade e aceleração ao jogador." },
+      { nome: "Elemental Tails", img: "Tails", desc: "Permite planar e ganhar mobilidade vertical avançada." },
+      { nome: "Elemental Klimbo", img: "Klimbo", desc: "Pequena criatura baseada no clássico dinossauro do jogo." },
+      { nome: "Elemental Jackrabbit", img: "Jackrabbit", desc: "Focado em agilidade e saltos." },
+      { nome: "Elemental 8-Bits", img: "8-Bits", desc: "Estética retrô pixelada." },
+      { nome: "Elemental Shadow", img: "Shadow", desc: "Concede camuflagem e bônus de movimentação furtiva." },
+      { nome: "Elemental Coroa (Crown)", img: "Coroa", desc: "Relacionado a bônus de vitórias consecutivas." },
+      { nome: "Elemental Disruptor", img: "Disruptor", desc: "Interfere com aparelhos e radares inimigos." },
+      { nome: "Elemental Raio X", img: "Raio-X", desc: "Marca inimigos periodicamente em uma área ao seu redor (o raio e a frequência aumentam a cada nível)." },
+      { nome: "Elemental Onigiri", img: "Onigiri", desc: "Aplica o efeito Sobrecarga após consumir qualquer item de cura ou escudo." },
+      { nome: "Elemental Mega Man", img: "Mega-Man", desc: "Reduz o atrito ao deslizar, permitindo que você deslize muito mais longe." },
+      { nome: "Elemental Sobreescudo", img: "Sobreescudo", desc: "Concede e regenera uma camada extra de Sobrescudo para o jogador." },
+      { nome: "Elemental Storm Scout", img: "Storm-Scout", desc: "Nova criatura da Tempestade." },
+      { nome: "Elemental Lagoa", img: "Lagoa", desc: "Salto carregado mais alto." },
+      { nome: "Elemental Blinky", img: "Blinky", desc: "Invisivel por alguns segundo ao receber dano." },
+      { nome: "Elemental Crash", img: "Crash", desc: "Ao saltar, gira e da dano circular ao redor." },
+      { nome: "Elemental Morgana", img: "Morgana", desc: "Aumenta a eficácia dos itens de cura" },
+      { nome: "Elemental Aniversário", img: "aniversario", desc: "Abrir baús tem uma chance de gerar um pedaço de bolo. Eliminações podem gerar bolo no nível máximo." },
+      { nome: "Elemental Salgueiro dos Desejos", img: "Salgueiro", desc: "Ao eliminar outros jogadores, extraia os Sprites que eles estiverem equipando. Afaste tudo ao sofrer dano. Fica irritado ao ser removido e marca você no mapa." },
+      { nome: "Elemental Mel", img: "Mel", desc: "Chance de gerar abelhas no local do acerto ao causar dano com uma arma de longo alcance" },
+      { nome: "Elemental Corrida Assustadora", img: "Corrida", desc: "(Ativa - Salto no Ar) Spooky Dash permite atravessar certos objetos. Acumule cargas com o passar do tempo. O tempo de recarga das cargas diminui a cada subida de nível!" },
+      { nome: "Elemental Vampiro", img: "Vampiro", desc: "Recupere vida ao causar dano a um inimigo. A porcentagem de vida recuperada aumenta a cada subida de nível!" },
+      { nome: "Elemental Espírito do Cervo", img: "Espírito", desc: "Ataques corpo a corpo causam mais dano. O dano de ataques corpo a corpo aumenta a cada subida de nível!" },
+      { nome: "Elemental Mergulho no Lixo", img: "Mergulho", desc: "Comida concede cura adicional. Encontre comida ao sair de objetos nos quais você estava escondido, ou, com uma pequena chance, ao abrir recipientes. Encontre comidas melhores a cada subida de nível!" }
     ];
 
     const tipos = [
-      { tipo: "Normal", badgeClass: "normal" },
-      { tipo: "Dourado", badgeClass: "dourado" },
-      { tipo: "Trapaça", badgeClass: "trapaca" },
-      { tipo: "Hacker", badgeClass: "hacker" },
-      { tipo: "Caçador", badgeClass: "cacador" },
-      { tipo: "Travessura", badgeClass: "travessura" },
-      { tipo: "Pato", badgeClass: "pato" }
+      { tipo: "Normal",     badgeClass: "v-normal",     files: ["Normal"] },
+      { tipo: "Dourado",    badgeClass: "v-dourado",    files: ["Dourado"] },
+      { tipo: "Trapaça",    badgeClass: "v-trapaca",    files: ["Trapaça", "Trapaca"] },
+      { tipo: "Hacker",     badgeClass: "v-hacker",     files: ["Hacker"] },
+      { tipo: "Caçador",    badgeClass: "v-cacador",    files: ["Cacador", "Caçador"] },
+      { tipo: "Travessura", badgeClass: "v-travessura", files: ["Travessura"] },
+      { tipo: "Pato",       badgeClass: "v-pato",       files: ["Pato"] }
     ];
 
-    const imageMap = {
-      "Elemental Aventura - Normal": "img/Elemental-Aventura-Normal.jpeg",
-      "Elemental Aventura - Dourado": "img/Elemental-Aventura-Dourado.jpeg",
-      "Elemental Aventura - Trapaça": "img/Elemental-Aventura-Trapaça.jpeg",
-      "Elemental Aventura - Hacker": "img/Elemental-Aventura-Hacker.jpeg",
-      "Elemental Aventura - Caçador": "img/Elemental-Aventura-Cacador.jpeg",
-      "Elemental Aventura - Travessura": "img/Elemental-Aventura-Travessura.jpeg",
-      "Elemental Aventura - Pato": "img/Elemental-Aventura-Pato.jpeg",
-      "Elemental Guarda da Moita-Normal": "img/Elemental-Moita-Normal.jpeg",
-      "Elemental Guarda da Moita-Dourado": "img/Elemental-Moita-Dourado.jpeg",
-      "Elemental Guarda da Moita-Trapaça": "img/Elemental-Moita-Trapaça.jpeg",
-      "Elemental Guarda da Moita-Hacker": "img/Elemental-Moita-Hacker.jpeg",
-      "Elemental Guarda da Moita-Caçador": "img/Elemental-Moita-Cacador.jpeg",
-      "Elemental Guarda da Moita-Travessura": "img/Elemental-Moita-Travessura.jpeg",
-      "Elemental Guarda da Moita-Pato": "img/Elemental-Moita-Pato.jpeg",
-      "Elemental Jonesy-Normal": "img/Elemental-Jonesy-Normal.jpeg",
-      "Elemental Jonesy-Dourado": "img/Elemental-Jonesy-Dourado.jpeg",
-      "Elemental Jonesy-Trapaça": "img/Elemental-Jonesy-Trapaça.jpeg",
-      "Elemental Jonesy-Hacker": "img/Elemental-Jonesy-Hacker.jpeg",
-      "Elemental Jonesy-Caçador": "img/Elemental-Jonesy-Cacador.jpeg",
-      "Elemental Jonesy-Travessura": "img/Elemental-Jonesy-Travessura.jpeg",
-      "Elemental Jonesy-Pato": "img/Elemental-Jonesy-Pato.jpeg",
-      "Elemental Sonic-Normal": "img/Elemental-Sonic-Normal.jpeg",
-      "Elemental Sonic-Dourado": "img/Elemental-Sonic-Dourado.jpeg",
-      "Elemental Sonic-Trapaça": "img/Elemental-Sonic-Trapaça.jpeg",
-      "Elemental Sonic-Hacker": "img/Elemental-Sonic-Hacker.jpeg",
-      "Elemental Sonic-Caçador": "img/Elemental-Sonic-Cacador.jpeg",
-      "Elemental Sonic-Travessura": "img/Elemental-Sonic-Travessura.jpeg",
-      "Elemental Tails-Normal": "img/Elemental-Tails-Normal.jpeg",
-      "Elemental Tails-Dourado": "img/Elemental-Tails-Dourado.jpeg",
-      "Elemental Tails-Trapaça": "img/Elemental-Tails-Trapaça.jpeg",
-      "Elemental Tails-Hacker": "img/Elemental-Tails-Hacker.jpeg",
-      "Elemental Tails-Caçador": "img/Elemental-Tails-Cacador.jpeg",
-      "Elemental Tails-Travessura": "img/Elemental-Tails-Travessura.jpeg",
-      "Elemental Shadow-Normal": "img/Elemental-Shadow-Normal.jpeg",
-      "Elemental Shadow-Dourado": "img/Elemental-Shadow-Dourado.jpeg",
-      "Elemental Shadow-Trapaça": "img/Elemental-Shadow-Trapaça.jpeg",
-      "Elemental Shadow-Hacker": "img/Elemental-Shadow-Hacker.jpeg",
-      "Elemental Shadow-Caçador": "img/Elemental-Shadow-Cacador.jpeg",
-      "Elemental Shadow-Travessura": "img/Elemental-Shadow-Travessura.jpeg",
-      "Elemental 8-Bits-Normal": "img/Elemental-8-Bits-Normal.jpeg",
-      "Elemental 8-Bits-Dourado": "img/Elemental-8-Bits-Dourado.jpeg",
-      "Elemental 8-Bits-Trapaça": "img/Elemental-8-Bits-Trapaça.jpeg",
-      "Elemental 8-Bits-Hacker": "img/Elemental-8-Bits-Hacker.jpeg",
-      "Elemental 8-Bits-Caçador": "img/Elemental-8-Bits-Cacador.jpeg",
-      "Elemental 8-Bits-Travessura": "img/Elemental-8-Bits-Travessura.jpeg",
-      "Elemental Jackrabbit-Normal": "img/Elemental-Jackrabbit-Normal.jpeg",
-      "Elemental Jackrabbit-Dourado": "img/Elemental-Jackrabbit-Dourado.jpeg",
-      "Elemental Jackrabbit-Trapaça": "img/Elemental-Jackrabbit-Trapaça.jpeg",
-      "Elemental Jackrabbit-Hacker": "img/Elemental-Jackrabbit-Hacker.jpeg",
-      "Elemental Jackrabbit-Caçador": "img/Elemental-Jackrabbit-Cacador.jpeg",
-      "Elemental Jackrabbit-Travessura": "img/Elemental-Jackrabbit-Travessura.jpeg",
-      "Elemental Coroa (Crown)-Normal": "img/Elemental-Coroa-Normal.jpeg",
-      "Elemental Coroa (Crown)-Dourado": "img/Elemental-Coroa-Dourado.jpeg",
-      "Elemental Coroa (Crown)-Trapaça": "img/Elemental-Coroa-Trapaça.jpeg",
-      "Elemental Coroa (Crown)-Hacker": "img/Elemental-Coroa-Hacker.jpeg",
-      "Elemental Coroa (Crown)-Caçador": "img/Elemental-Coroa-Cacador.jpeg",
-      "Elemental Coroa (Crown)-Travessura": "img/Elemental-Coroa-Travessura.jpeg",
-      "Elemental Disruptor-Normal": "img/Elemental-Disruptor-Normal.jpeg",
-      "Elemental Disruptor-Dourado": "img/Elemental-Disruptor-Dourado.jpeg",
-      "Elemental Disruptor-Trapaça": "img/Elemental-Disruptor-Trapaça.jpeg",
-      "Elemental Disruptor-Hacker": "img/Elemental-Disruptor-Hacker.jpeg",
-      "Elemental Disruptor-Caçador": "img/Elemental-Disruptor-Cacador.jpeg",
-      "Elemental Disruptor-Travessura": "img/Elemental-Disruptor-Travessura.jpeg",
-      "Elemental Klimbo-Normal": "img/Elemental-Klimbo-Normal.jpeg",
-      "Elemental Klimbo-Dourado": "img/Elemental-Klimbo-Dourado.jpeg",
-      "Elemental Klimbo-Trapaça": "img/Elemental-Klimbo-Trapaça.jpeg",
-      "Elemental Klimbo-Hacker": "img/Elemental-Klimbo-Hacker.jpeg",
-      "Elemental Klimbo-Caçador": "img/Elemental-Klimbo-Cacador.jpeg",
-      "Elemental Klimbo-Travessura": "img/Elemental-Klimbo-Travessura.jpeg",
-      "Elemental Klimbo-Pato": "img/Elemental-Klimbo-Pato.jpeg",
-      "Elemental Raio X-Normal": "img/Elemental-Raio-X-Normal.jpeg",
-      "Elemental Raio X-Dourado": "img/Elemental-Raio-X-Dourado.jpeg",
-      "Elemental Raio X-Trapaça": "img/Elemental-Raio-X-Trapaça.jpeg",
-      "Elemental Raio X-Hacker": "img/Elemental-Raio-X-Hacker.jpeg",
-      "Elemental Raio X-Caçador": "img/Elemental-Raio-X-Cacador.jpeg",
-      "Elemental Raio X-Travessura": "img/Elemental-Raio-X-Travessura.jpeg",
-      "Elemental Onigiri-Normal": "img/Elemental-Onigiri-Normal.jpeg",
-      "Elemental Onigiri-Dourado": "img/Elemental-Onigiri-Dourado.jpeg",
-      "Elemental Onigiri-Trapaça": "img/Elemental-Onigiri-Trapaça.jpeg",
-      "Elemental Onigiri-Hacker": "img/Elemental-Onigiri-Hacker.jpeg",
-      "Elemental Onigiri-Caçador": "img/Elemental-Onigiri-Cacador.jpeg",
-      "Elemental Onigiri-Travessura": "img/Elemental-Onigiri-Travessura.jpeg",
-      "Elemental Mega Man-Normal": "img/Elemental-Mega-Man-Normal.jpeg",
-      "Elemental Sobreescudo-Normal": "img/Elemental-Sobreescudo-Normal.jpeg",
-      "Elemental Sobreescudo-Dourado": "img/Elemental-Sobreescudo-Dourado.jpeg",
-      "Elemental Sobreescudo-Trapaça": "img/Elemental-Sobreescudo-Trapaça.jpeg",
-      "Elemental Sobreescudo-Hacker": "img/Elemental-Sobreescudo-Hacker.jpeg",
-      "Elemental Sobreescudo-Caçador": "img/Elemental-Sobreescudo-Cacador.jpeg",
-      "Elemental Sobreescudo-Travessura": "img/Elemental-Sobreescudo-Travessura.jpeg",
-      "Elemental Storm Scout-Normal": "img/Elemental-Storm-Scout-Normal.jpeg",
-      "Elemental Storm Scout-Dourado": "img/Elemental-Storm-Scout-Dourado.jpeg",
-      "Elemental Storm Scout-Trapaça": "img/Elemental-Storm-Scout-Trapaça.jpeg",
-      "Elemental Storm Scout-Hacker": "img/Elemental-Storm-Scout-Hacker.jpeg",
-      "Elemental Storm Scout-Caçador": "img/Elemental-Storm-Scout-Cacador.jpeg",
-      "Elemental Storm Scout-Travessura": "img/Elemental-Storm-Scout-Travessura.jpeg",
-      "Elemental Lagoa-Normal": "img/Elemental-Lagoa-Normal.jpeg",
-      "Elemental Lagoa-Dourado": "img/Elemental-Lagoa-Dourado.jpeg",
-      "Elemental Lagoa-Trapaça": "img/Elemental-Lagoa-Trapaça.jpeg",
-      "Elemental Lagoa-Hacker": "img/Elemental-Lagoa-Hacker.jpeg",
-      "Elemental Lagoa-Caçador": "img/Elemental-Lagoa-Cacador.jpeg",
-      "Elemental Lagoa-Travessura": "img/Elemental-Lagoa-Travessura.jpeg",
-      "Elemental Blinky-Normal": "img/Elemental-Blinky-Normal.jpeg",
-      "Elemental Blinky-Dourado": "img/Elemental-Blinky-Dourado.jpeg",
-      "Elemental Blinky-Trapaça": "img/Elemental-Blinky-Trapaça.jpeg",
-      "Elemental Blinky-Hacker": "img/Elemental-Blinky-Hacker.jpeg",
-      "Elemental Blinky-Caçador": "img/Elemental-Blinky-Cacador.jpeg",
-      "Elemental Blinky-Travessura": "img/Elemental-Blinky-Travessura.jpeg",
-      "Elemental Crash-Normal": "img/Elemental-Crash-Normal.jpeg",
-      "Elemental Crash-Dourado": "img/Elemental-Crash-Dourado.jpeg",
-      "Elemental Crash-Trapaça": "img/Elemental-Crash-Trapaça.jpeg",
-      "Elemental Crash-Hacker": "img/Elemental-Crash-Hacker.jpeg",
-      "Elemental Crash-Caçador": "img/Elemental-Crash-Cacador.jpeg",
-      "Elemental Crash-Travessura": "img/Elemental-Crash-Travessura.jpeg",
-      "Elemental Morgana-Normal": "img/Elemental-Morgana-Normal.jpeg",
-      "Elemental Morgana-Dourado": "img/Elemental-Morgana-Dourado.jpeg",
-      "Elemental Morgana-Trapaça": "img/Elemental-Morgana-Trapaca.jpeg",
-      "Elemental Morgana-Hacker": "img/Elemental-Morgana-Hacker.jpeg",
-      "Elemental Morgana-Caçador": "img/Elemental-Morgana-Cacador.jpeg",
-      "Elemental Morgana-Travessura": "img/Elemental-Morgana-Travessura.jpeg",
-      "Elemental Aniversário-Normal": "img/Elemental-aniversario-Normal.jpeg",
-      "Elemental Aniversário-Dourado": "img/Elemental-aniversario-Dourado.jpeg",
-      "Elemental Aniversário-Trapaça": "img/Elemental-aniversario-Trapaca.jpeg",
-      "Elemental Aniversário-Hacker": "img/Elemental-aniversario-Hacker.jpeg",
-      "Elemental Aniversário-Caçador": "img/Elemental-aniversario-Cacador.jpeg",
-      "Elemental Aniversário-Travessura": "img/Elemental-aniversario-Travessura.jpeg",
-      "Elemental Corrida Assustadora-Normal": "img/Elemental-Corrida-Normal.jpeg",
-      "Elemental Corrida Assustadora-Dourado": "img/Elemental-Corrida-Dourado.jpeg",
-      "Elemental Corrida Assustadora-Trapaça": "img/Elemental-Corrida-Trapaça.jpeg",
-      "Elemental Corrida Assustadora-Hacker": "img/Elemental-Corrida-Hacker.jpeg",
-      "Elemental Corrida Assustadora-Caçador": "img/Elemental-Corrida-Cacador.jpeg",
-      "Elemental Corrida Assustadora-Travessura": "img/Elemental-Corrida-Travessura.jpeg",
-      "Elemental Corrida Assustadora-Pato": "img/Elemental-Corrida-Pato.jpeg",
-      "Elemental Vampiro-Normal": "img/Elemental-Vampiro-Normal.jpeg",
-      "Elemental Vampiro-Dourado": "img/Elemental-Vampiro-Dourado.jpeg",
-      "Elemental Vampiro-Trapaça": "img/Elemental-Vampiro-Trapaça.jpeg",
-      "Elemental Vampiro-Hacker": "img/Elemental-Vampiro-Hacker.jpeg",
-      "Elemental Vampiro-Caçador": "img/Elemental-Vampiro-Cacador.jpeg",
-      "Elemental Vampiro-Travessura": "img/Elemental-Vampiro-Travessura.jpeg",
-      "Elemental Espírito do Cervo-Normal": "img/Elemental-Espírito-Normal.jpeg",
-      "Elemental Espírito do Cervo-Dourado": "img/Elemental-Espírito-Dourado.jpeg",
-      "Elemental Espírito do Cervo-Trapaça": "img/Elemental-Espírito-Trapaça.jpeg",
-      "Elemental Espírito do Cervo-Hacker": "img/Elemental-Espírito-Hacker.jpeg",
-      "Elemental Espírito do Cervo-Caçador": "img/Elemental-Espírito-Cacador.jpeg",
-      "Elemental Espírito do Cervo-Travessura": "img/Elemental-Espírito-Travessura.jpeg",
-      "Elemental Mergulho no Lixo-Normal": "img/Elemental-Mergulho-Normal.jpeg",
-      "Elemental Mergulho no Lixo-Dourado": "img/Elemental-Mergulho-Dourado.jpeg",
-      "Elemental Mergulho no Lixo-Trapaça": "img/Elemental-Mergulho-Trapaça.jpeg",
-      "Elemental Mergulho no Lixo-Hacker": "img/Elemental-Mergulho-Hacker.jpeg",
-      "Elemental Mergulho no Lixo-Caçador": "img/Elemental-Mergulho-Cacador.jpeg",
-      "Elemental Mergulho no Lixo-Travessura": "img/Elemental-Mergulho-Travessura.jpeg",
-      "Elemental Mel-Normal": "img/Elemental-Mel-Normal.jpeg",
-      "Elemental Mel-Dourado": "img/Elemental-Mel-Dourado.jpeg",
-      "Elemental Mel-Trapaça": "img/Elemental-Mel-Trapaça.jpeg",
-      "Elemental Mel-Hacker": "img/Elemental-Mel-Hacker.jpeg",
-      "Elemental Mel-Caçador": "img/Elemental-Mel-Cacador.jpeg",
-      "Elemental Mel-Travessura": "img/Elemental-Mel-Travessura.jpeg",
-      "Elemental Salgueiro-Normal": "img/Elemental-Salgueiro-Normal.jpeg",
-      "Elemental Salgueiro-Dourado": "img/Elemental-Salgueiro-Dourado.jpeg",
-      "Elemental Salgueiro-Trapaça": "img/Elemental-Salgueiro-Trapaça.jpeg",
-      "Elemental Salgueiro-Hacker": "img/Elemental-Salgueiro-Hacker.jpeg",
-      "Elemental Salgueiro-Caçador": "img/Elemental-Salgueiro-Cacador.jpeg",
-      "Elemental Salgueiro-Travessura": "img/Elemental-Salgueiro-Travessura.jpeg"
+    const badgeMap = {
+      "Normal": "v-normal", "Dourado": "v-dourado", "Trapaça": "v-trapaca", "Hacker": "v-hacker",
+      "Caçador": "v-cacador", "Travessura": "v-travessura", "Pato": "v-pato"
     };
+
+    /* ---------- Resolução inteligente de imagens ----------
+       Tenta várias combinações (extensão, maiúsculas/minúsculas, com/sem acento)
+       e usa a primeira que carregar. Isso corrige o caso de nomes que não batiam. */
+    const EXTS = ["jpeg", "jpg", "png", "webp"];
+    const stripAccents = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+    const uniq = arr => [...new Set(arr)];
+
+    function buildCandidates(item) {
+      // Se o item tem caminho explícito (ex.: elemental personalizado), ele vem primeiro
+      const list = [];
+      if (item.img && item.img.trim() !== "" && item.img !== "#") list.push(item.img.trim());
+
+      if (item.prefix && item.fileVariants) {
+        const prefixes = uniq([item.prefix, cap(item.prefix), item.prefix.toLowerCase(), stripAccents(item.prefix), cap(stripAccents(item.prefix))]);
+        EXTS.forEach(ext => {
+          prefixes.forEach(p => {
+            item.fileVariants.forEach(v => list.push(`img/Elemental-${p}-${v}.${ext}`));
+          });
+        });
+      }
+      return uniq(list).map(p => /^https?:\/\//i.test(p) ? p : encodeURI(p));
+    }
 
     let elementaisData = [];
     let counter = 1;
 
     baseElementais.forEach((el) => {
       tipos.forEach((t) => {
-        const key = `${el.nome}-${t.tipo}`;
         elementaisData.push({
           id: counter,
           nome: el.nome,
           descricao: el.desc,
           versao: t.tipo,
           badgeClass: t.badgeClass,
-          img: imageMap[key] || "",
+          prefix: el.img,
+          fileVariants: t.files,
+          img: "",
           hidden: IDS_OCULTOS.includes(counter)
         });
         counter++;
@@ -295,88 +363,127 @@
     let currentFilter = 'all';
     let searchTerm = '';
     let userState = {};
+    const imgStatus = {};      // id -> 'ok' | 'fail' | 'loading'
+    const imgUrlResolved = {}; // id -> url final
 
     const grid = document.getElementById('grid');
 
-    // Layout do Card Limpo sem texto de 'Sem Imagem'
+    function updateImgStats() {
+      const active = elementaisData.filter(x => !x.hidden);
+      const ok = active.filter(x => imgStatus[x.id] === 'ok').length;
+      const fail = active.filter(x => imgStatus[x.id] === 'fail').length;
+      const el = document.getElementById('img-stats');
+      if (el) el.innerHTML = `<span class="text-emerald-400">${ok}</span> carregadas · <span class="${fail ? 'text-rose-400' : 'text-slate-500'}">${fail}</span> sem imagem`;
+    }
+
+    function showPlaceholder(box, item) {
+      box.classList.remove('loading');
+      box.innerHTML = `<div class="no-img" title="Imagem não encontrada para ${item.nome} (${item.versao})"><span class="icon">👾</span><span>Sem imagem</span></div>`;
+    }
+
+    function loadImageInto(box, item) {
+      const candidates = buildCandidates(item);
+      if (candidates.length === 0) {
+        imgStatus[item.id] = 'fail';
+        showPlaceholder(box, item);
+        updateImgStats();
+        return;
+      }
+      imgStatus[item.id] = 'loading';
+      box.classList.add('loading');
+
+      const img = new Image();
+      img.alt = `${item.nome} ${item.versao}`;
+      img.loading = 'lazy';
+      img.decoding = 'async';
+      let idx = 0;
+
+      img.onload = () => {
+        box.classList.remove('loading');
+        box.innerHTML = '';
+        box.appendChild(img);
+        requestAnimationFrame(() => img.classList.add('loaded'));
+        imgStatus[item.id] = 'ok';
+        imgUrlResolved[item.id] = img.src;
+        updateImgStats();
+      };
+      img.onerror = () => {
+        idx++;
+        if (idx < candidates.length) {
+          img.src = candidates[idx];
+        } else {
+          imgStatus[item.id] = 'fail';
+          showPlaceholder(box, item);
+          updateImgStats();
+        }
+      };
+      img.src = candidates[0];
+    }
+
+    // Só começa a carregar quando o card se aproxima da tela
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const box = entry.target;
+        io.unobserve(box);
+        const item = elementaisData.find(x => x.id === Number(box.dataset.id));
+        if (item) loadImageInto(box, item);
+      });
+    }, { rootMargin: '300px' });
+
     function renderCard(item) {
       let card = document.getElementById(`card-${item.id}`);
-      if (!card) {
+      const isNew = !card;
+      if (isNew) {
         card = document.createElement('div');
         card.id = `card-${item.id}`;
         grid.appendChild(card);
       }
 
-      card.className = "card-base relative flex flex-col justify-between p-3.5 rounded-2xl border border-slate-800/80 bg-slate-900/70 backdrop-blur-md hover:border-cyan-500/40 select-none group shadow-lg shadow-black/40";
-
-      if (item.hidden) {
-        card.classList.add('hidden');
-      }
-
-      const isValidImg = item.img && item.img.trim() !== "" && item.img !== "#";
-      
-      // Placeholder discreto: apenas ícone suave centralizado com fundo translúcido
-      const imgPlaceholder = `
-        <div class="w-full h-24 bg-gradient-to-b from-slate-950/80 to-slate-900/60 border border-slate-800/60 rounded-xl flex items-center justify-center mb-2.5 overflow-hidden group-hover:border-slate-700/80 transition-colors">
-          <span class="text-2xl opacity-25 filter grayscale group-hover:opacity-40 transition-opacity">👾</span>
-        </div>
-      `;
-
-      const imgElement = isValidImg 
-        ? `<img src="${item.img}" alt="${item.nome} ${item.versao}" class="w-full h-24 object-contain rounded-xl mb-2.5 p-1 bg-slate-950/80 border border-slate-800/60 group-hover:border-slate-700 transition-colors" onerror="this.outerHTML='${imgPlaceholder.replace(/'/g, "\\'")}'">`
-        : imgPlaceholder;
+      card.className = `card ${item.badgeClass || 'v-normal'} select-none group`;
+      if (item.hidden) card.classList.add('is-hidden');
 
       card.innerHTML = `
-        <div>
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-[11px] font-mono font-bold text-slate-400/90 tracking-wider">#${item.id}</span>
-            <span class="text-[10px] font-semibold px-2 py-0.5 rounded-md uppercase tracking-wider font-gaming ${item.badgeClass}">${item.versao}</span>
-          </div>
-          
-          <div class="relative">
-            <div id="crown-badge-${item.id}" class="hidden absolute top-1 right-1 bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 px-2 py-0.5 rounded-md text-[10px] font-extrabold shadow-md flex items-center gap-1 z-10 font-gaming tracking-wide">
-              <span>👑</span> DOMINADO
-            </div>
-            ${imgElement}
+        <div class="min-w-0">
+          <div class="flex items-center justify-between gap-2 mb-2">
+            <span class="text-[11px] font-mono font-bold text-slate-400 tracking-wider">#${item.id}</span>
+            <span class="tag text-[10px] font-bold px-2 py-0.5 uppercase tracking-wider font-gaming truncate max-w-[110px]">${item.versao}</span>
           </div>
 
-          <h2 class="text-xs font-semibold text-slate-200 line-clamp-1 group-hover:text-cyan-300 transition-colors" title="${item.nome}">${item.nome}</h2>
+          <div class="relative">
+            <div id="crown-badge-${item.id}" class="crown-badge is-hidden">👑 DOMINADO</div>
+            <div class="img-box loading" id="imgbox-${item.id}" data-id="${item.id}"></div>
+          </div>
+
+          <h2 class="mt-2.5 text-[13px] font-semibold text-slate-100 leading-tight line-clamp-2 min-h-[2.1rem] group-hover:text-cyan-300 transition-colors" title="${item.nome}">${item.nome}</h2>
         </div>
 
-        <div class="mt-3.5 flex items-center justify-between gap-1.5 pt-2.5 border-t border-slate-800/70">
-          <button type="button" onclick="showModal(${item.id})" class="text-slate-400 hover:text-cyan-400 hover:bg-cyan-950/40 p-1.5 rounded-lg text-xs flex items-center gap-1 transition-all" title="Ver Habilidade">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path stroke-width="2" d="M12 16v-4m0-4h.01"/></svg>
-            <span class="text-[10px] font-medium hidden sm:inline">Info</span>
-          </button>
-
-          <button type="button" onclick="openNotesModal(${item.id})" class="text-slate-400 hover:text-amber-300 hover:bg-amber-950/30 p-1.5 rounded-lg text-xs flex items-center gap-1 transition-all" title="Minhas Anotações Secretas">
-            <span class="text-xs">📝</span>
-            <span id="note-indicator-${item.id}" class="w-1.5 h-1.5 rounded-full bg-amber-400 shadow-sm shadow-amber-400 hidden"></span>
-          </button>
-
-          <div class="flex items-center gap-1.5 ml-auto">
-            <button 
-              type="button" 
-              id="crown-btn-${item.id}" 
-              onclick="toggleCrown(${item.id})" 
-              title="Marcar como Dominado com Coroa"
-              class="w-7 h-7 rounded-lg border border-slate-700/80 bg-slate-950/70 flex items-center justify-center text-xs text-slate-500 hover:text-amber-400 hover:border-amber-500/50 hover:bg-amber-950/30 transition-all active:scale-95"
-            >
-              👑
-            </button>
-
-            <button 
-              type="button" 
-              id="check-${item.id}" 
-              onclick="toggleItem(${item.id})" 
-              title="Marcar como Obtido/Capturado"
-              class="w-7 h-7 rounded-lg border border-slate-700/80 bg-slate-950/70 flex items-center justify-center text-transparent font-bold text-xs hover:border-emerald-500/70 hover:text-emerald-400/40 transition-all active:scale-95"
-            >
-              ✓
-            </button>
+        <div class="card-foot">
+          <div class="grp">
+            <button type="button" class="act" onclick="showModal(${item.id})" title="Ver habilidade" aria-label="Ver habilidade">ℹ️</button>
+            <button type="button" class="act" id="note-btn-${item.id}" onclick="openNotesModal(${item.id})" title="Minhas anotações secretas" aria-label="Anotações">📝</button>
+          </div>
+          <div class="grp">
+            <button type="button" class="act crown" id="crown-btn-${item.id}" onclick="toggleCrown(${item.id})" title="Marcar como Dominado" aria-label="Dominado">👑</button>
+            <button type="button" class="act check" id="check-${item.id}" onclick="toggleItem(${item.id})" title="Marcar como Obtido" aria-label="Obtido">✓</button>
           </div>
         </div>
       `;
+
+      if (!item.hidden) {
+        const box = card.querySelector('.img-box');
+        // reaplica se o card foi re-renderizado
+        if (imgStatus[item.id] === 'ok' && imgUrlResolved[item.id]) {
+          box.classList.remove('loading');
+          const im = new Image();
+          im.src = imgUrlResolved[item.id];
+          im.alt = `${item.nome} ${item.versao}`;
+          im.className = 'loaded';
+          box.appendChild(im);
+        } else {
+          io.observe(box);
+        }
+      }
     }
 
     elementaisData.forEach(item => renderCard(item));
@@ -393,6 +500,8 @@
         } else {
           elementaisData.push(cItem);
         }
+        delete imgStatus[cItem.id];
+        delete imgUrlResolved[cItem.id];
         renderCard(cItem);
       });
       updateUserView();
@@ -418,7 +527,7 @@
         if (!cardEl) return;
 
         if (item.hidden) {
-          cardEl.classList.add('hidden');
+          cardEl.classList.add('is-hidden');
           return;
         }
 
@@ -429,25 +538,20 @@
         if (currentFilter === 'crowned') matchesFilter = status.crowned;
         if (currentFilter === 'missing') matchesFilter = !status.captured;
 
-        const matchesSearch = searchTerm === '' || 
-          item.nome.toLowerCase().includes(searchTerm) || 
-          item.versao.toLowerCase().includes(searchTerm) || 
+        const matchesSearch = searchTerm === '' ||
+          item.nome.toLowerCase().includes(searchTerm) ||
+          item.versao.toLowerCase().includes(searchTerm) ||
           item.id.toString() === searchTerm;
 
         if (matchesFilter && matchesSearch) {
-          cardEl.classList.remove('hidden');
+          cardEl.classList.remove('is-hidden');
           visibleCount++;
         } else {
-          cardEl.classList.add('hidden');
+          cardEl.classList.add('is-hidden');
         }
       });
 
-      const emptyMsg = document.getElementById('empty-msg');
-      if (visibleCount === 0) {
-        emptyMsg.classList.remove('hidden');
-      } else {
-        emptyMsg.classList.add('hidden');
-      }
+      document.getElementById('empty-msg').classList.toggle('is-hidden', visibleCount !== 0);
     }
 
     function updateUserView() {
@@ -460,41 +564,19 @@
         const crownBtn = document.getElementById(`crown-btn-${item.id}`);
         const crownBadge = document.getElementById(`crown-badge-${item.id}`);
         const cardEl = document.getElementById(`card-${item.id}`);
-        const noteDot = document.getElementById(`note-indicator-${item.id}`);
+        const noteBtn = document.getElementById(`note-btn-${item.id}`);
         if (!checkEl) return;
 
         const status = getItemStatus(item.id);
-
         if (status.captured) totalChecked++;
         if (status.crowned) totalCrowned++;
 
-        if (status.captured) {
-          checkEl.className = "w-7 h-7 rounded-lg bg-emerald-500 border border-emerald-400 flex items-center justify-center text-slate-950 font-extrabold text-xs shadow-md shadow-emerald-500/30";
-          checkEl.textContent = "✓";
-          cardEl.classList.add("bg-emerald-950/20", "border-emerald-500/40");
-        } else {
-          checkEl.className = "w-7 h-7 rounded-lg border border-slate-700/80 bg-slate-950/70 flex items-center justify-center text-transparent text-xs hover:border-emerald-500/70 hover:text-emerald-400/40 transition-all";
-          checkEl.textContent = "✓";
-          cardEl.classList.remove("bg-emerald-950/20", "border-emerald-500/40");
-        }
-
-        if (status.crowned) {
-          crownBtn.className = "w-7 h-7 rounded-lg bg-gradient-to-r from-amber-500 to-yellow-400 border border-amber-300 flex items-center justify-center text-xs text-slate-950 font-bold shadow-md shadow-amber-500/40";
-          crownBadge.classList.remove("hidden");
-          cardEl.classList.add("card-crowned");
-        } else {
-          crownBtn.className = "w-7 h-7 rounded-lg border border-slate-700/80 bg-slate-950/70 flex items-center justify-center text-xs text-slate-500 hover:text-amber-400 hover:border-amber-500/50 hover:bg-amber-950/30 transition-all";
-          crownBadge.classList.add("hidden");
-          cardEl.classList.remove("card-crowned");
-        }
-
-        if (noteDot) {
-          if (status.note && status.note.trim() !== '') {
-            noteDot.classList.remove('hidden');
-          } else {
-            noteDot.classList.add('hidden');
-          }
-        }
+        checkEl.classList.toggle('check-on', status.captured);
+        cardEl.classList.toggle('owned', status.captured && !status.crowned);
+        crownBtn.classList.toggle('crown-on', status.crowned);
+        crownBadge.classList.toggle('is-hidden', !status.crowned);
+        cardEl.classList.toggle('crowned', status.crowned);
+        noteBtn.classList.toggle('note-on', Boolean(status.note && status.note.trim() !== ''));
       });
 
       const total = activeItems.length;
@@ -512,9 +594,10 @@
       document.getElementById('progress-pct').innerText = `${pct}%`;
 
       applyFilters();
+      updateImgStats();
     }
 
-    // Inicialização da Autenticação Anônima
+    // Autenticação Anônima
     signInAnonymously(auth).catch((error) => {
       console.error("Erro na autenticação anônima:", error);
     });
@@ -546,7 +629,7 @@
       const status = getItemStatus(id);
       const newCaptured = !status.captured;
       const newCrowned = newCaptured ? status.crowned : false;
-      
+
       set(ref(db, `user_data/${currentUid}/${id}`), {
         captured: newCaptured,
         crowned: newCrowned,
@@ -575,7 +658,7 @@
 
       document.getElementById('note-modal-title').innerText = `${item.nome} (${item.versao})`;
       document.getElementById('note-text').value = status.note || '';
-      document.getElementById('notes-modal').classList.remove('hidden');
+      document.getElementById('notes-modal').classList.remove('is-hidden');
     };
 
     window.saveNote = () => {
@@ -592,16 +675,16 @@
     };
 
     window.closeNotesModal = () => {
-      document.getElementById('notes-modal').classList.add('hidden');
+      document.getElementById('notes-modal').classList.add('is-hidden');
       currentNoteId = null;
     };
 
     window.openNewElementalModal = () => {
-      document.getElementById('new-modal').classList.remove('hidden');
+      document.getElementById('new-modal').classList.remove('is-hidden');
     };
 
     window.closeNewElementalModal = () => {
-      document.getElementById('new-modal').classList.add('hidden');
+      document.getElementById('new-modal').classList.add('is-hidden');
     };
 
     window.saveNewElemental = () => {
@@ -618,22 +701,12 @@
       const maxId = elementaisData.reduce((max, item) => Math.max(max, item.id), 0);
       const newId = maxId + 1;
 
-      const badgeMap = {
-        "Normal": "normal",
-        "Dourado": "dourado",
-        "Trapaça": "trapaca",
-        "Hacker": "hacker",
-        "Caçador": "cacador",
-        "Travessura": "travessura",
-        "Pato": "pato"
-      };
-
       const newItem = {
         id: newId,
         nome: nome.startsWith("Elemental") ? nome : `Elemental ${nome}`,
         descricao: desc || "Habilidade não informada.",
         versao: versao,
-        badgeClass: badgeMap[versao] || "normal",
+        badgeClass: badgeMap[versao] || "v-normal",
         img: img || "#",
         hidden: false
       };
@@ -648,25 +721,11 @@
 
     window.setFilter = (filterType) => {
       currentFilter = filterType;
-      const buttons = {
-        'all': document.getElementById('btn-all'),
-        'checked': document.getElementById('btn-checked'),
-        'crowned': document.getElementById('btn-crowned'),
-        'missing': document.getElementById('btn-missing')
-      };
-
-      Object.keys(buttons).forEach(type => {
-        if (type === filterType) {
-          if (type === 'crowned') {
-            buttons[type].className = "px-3.5 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 shadow-md shadow-amber-500/20 flex items-center gap-1.5 transition-all";
-          } else {
-            buttons[type].className = "px-3.5 py-1.5 rounded-xl text-xs font-bold bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/20 flex items-center gap-1.5 transition-all";
-          }
-        } else {
-          buttons[type].className = "px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-900/80 text-slate-300 hover:bg-slate-800 hover:text-white border border-slate-800/80 flex items-center gap-1.5 transition-all";
-        }
+      ['all', 'checked', 'crowned', 'missing'].forEach(type => {
+        const b = document.getElementById(`btn-${type}`);
+        b.classList.toggle('active', type === filterType);
+        b.classList.toggle('gold', type === filterType && type === 'crowned');
       });
-
       applyFilters();
     };
 
@@ -678,182 +737,163 @@
     window.showModal = (id) => {
       const item = elementaisData.find(x => x.id === id);
       if (!item) return;
-      document.getElementById('modal-title').innerText = `${item.nome} (#${item.id})`;
-      document.getElementById('modal-version').innerText = item.versao;
-      document.getElementById('modal-version').className = `text-[11px] font-bold px-2.5 py-0.5 rounded-md uppercase font-gaming ${item.badgeClass}`;
+      document.getElementById('modal-title').innerText = item.nome;
+      document.getElementById('modal-id').innerText = `#${item.id}`;
+      const v = document.getElementById('modal-version');
+      v.innerText = item.versao;
+      v.className = `tag text-[11px] font-bold px-2.5 py-0.5 uppercase font-gaming ${item.badgeClass}`;
       document.getElementById('modal-desc').innerText = item.descricao;
-      document.getElementById('info-modal').classList.remove('hidden');
+
+      const mi = document.getElementById('modal-img');
+      const url = imgUrlResolved[id];
+      if (url) {
+        mi.innerHTML = `<img src="${url}" alt="${item.nome}" class="w-full h-full object-contain p-2">`;
+        mi.parentElement.style.setProperty('--c', getComputedStyle(document.getElementById(`card-${id}`)).getPropertyValue('--c'));
+        mi.classList.remove('is-hidden');
+      } else {
+        mi.classList.add('is-hidden');
+      }
+      document.getElementById('info-modal').classList.remove('is-hidden');
     };
 
     window.closeModal = () => {
-      document.getElementById('info-modal').classList.add('hidden');
+      document.getElementById('info-modal').classList.add('is-hidden');
     };
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') { closeModal(); closeNotesModal(); closeNewElementalModal(); }
+    });
   </script>
 </head>
-<body class="text-slate-100 min-h-screen p-4 sm:p-8 font-sans selection:bg-cyan-500 selection:text-black">
-  <div class="max-w-7xl mx-auto">
-    
-    <!-- Top Header -->
-    <header class="mb-6 p-6 rounded-3xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6 shadow-2xl shadow-black/50">
-      <div>
-        <div class="flex items-center gap-3 mb-2">
-          <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span class="text-xs font-mono uppercase tracking-widest text-slate-400">Autenticado & Seguro</span>
-          <span class="text-xs font-mono px-2.5 py-0.5 rounded-md bg-cyan-950/70 border border-cyan-500/40 text-cyan-300 font-bold tracking-wide" id="current-username-display">JOGADOR</span>
+<body class="text-slate-100 min-h-screen p-3 sm:p-6 lg:p-8 selection:bg-cyan-400 selection:text-black">
+  <div class="max-w-[1600px] mx-auto relative-layer">
+
+    <!-- Header -->
+    <header class="panel clip-hud mb-5 p-5 sm:p-7 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 shadow-2xl shadow-black/50">
+      <div class="min-w-0">
+        <div class="flex flex-wrap items-center gap-2.5 mb-3">
+          <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_10px_#34d399]"></span>
+          <span class="text-[11px] font-mono uppercase tracking-[0.25em] text-slate-400">Sistema online</span>
+          <span class="text-[11px] font-gaming px-3 py-0.5 bg-cyan-500/15 border border-cyan-400/50 text-cyan-300 font-bold tracking-widest clip-btn" id="current-username-display">JOGADOR</span>
         </div>
-        <h1 class="text-2xl sm:text-3xl font-bold font-gaming text-white tracking-wide">
-          ESPÍRITOS ELEMENTAIS // <span class="text-cyan-400">FORTNITE</span>
+        <h1 class="font-fn text-4xl sm:text-5xl lg:text-6xl leading-none text-white" style="text-shadow: 0 0 24px rgba(139,92,246,.6), 3px 3px 0 rgba(34,211,238,.35);">
+          Espíritos Elementais <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-violet-400">// Fortnite</span>
         </h1>
-        <p class="text-sm text-slate-400 mt-1">Checklist individual e isolado com persistência em tempo real.</p>
+        <p class="text-sm text-slate-400 mt-2">Checklist individual com sincronização em tempo real.</p>
       </div>
 
-      <!-- Barra de Progresso Global do Jogador -->
-      <div class="w-full md:w-72 bg-slate-950/80 p-4 rounded-2xl border border-slate-800/80 shadow-inner">
-        <div class="flex justify-between items-center text-xs font-mono mb-2">
-          <span class="text-slate-400">Meus Coletados</span>
+      <!-- Progresso -->
+      <div class="w-full lg:w-80 shrink-0 bg-black/40 p-4 border border-cyan-500/20 clip-hud">
+        <div class="flex justify-between items-center text-xs font-mono mb-2 gap-2">
+          <span class="text-slate-400 uppercase tracking-wider">Coletados</span>
           <div class="flex items-center gap-2">
             <span id="crowned-counter" class="text-amber-400 font-bold text-[11px]">0 Dominados</span>
             <span class="text-slate-700">|</span>
             <span id="counter" class="text-emerald-400 font-bold">0 / 0</span>
           </div>
         </div>
-        <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden border border-slate-800/80">
-          <div id="progress-bar" class="bg-gradient-to-r from-emerald-500 to-cyan-400 h-full w-0 transition-all duration-300"></div>
+        <div class="w-full bg-slate-900 h-3 overflow-hidden border border-slate-700/80 skew-x-[-18deg]">
+          <div id="progress-bar" class="bg-gradient-to-r from-violet-500 via-cyan-400 to-emerald-400 h-full w-0 transition-all duration-500 shadow-[0_0_12px_rgba(34,211,238,.7)]"></div>
         </div>
-        <div class="text-right text-[11px] font-mono text-slate-500 mt-1.5" id="progress-pct">0%</div>
+        <div class="flex justify-between text-[11px] font-mono text-slate-500 mt-2">
+          <span id="img-stats" class="text-[10px]"></span>
+          <span id="progress-pct" class="text-cyan-300 font-bold">0%</span>
+        </div>
       </div>
     </header>
 
-    <!-- Barra de Perfil -->
-    <div class="mb-5 flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-900/50 p-3.5 rounded-2xl border border-slate-800/80 backdrop-blur-md">
-      <div class="flex items-center gap-2.5 w-full sm:w-auto">
-        <span class="text-xs font-mono text-slate-400">Meu Nick:</span>
-        <input 
-          type="text" 
-          id="user-input" 
-          placeholder="Seu Nick..." 
-          class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-400 w-36 font-semibold transition-colors"
-        >
-        <button 
-          onclick="changeUser()" 
-          class="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl border border-slate-700 transition-all active:scale-95"
-        >
-          Salvar
-        </button>
+    <!-- Perfil + ação -->
+    <div class="panel mb-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3.5">
+      <div class="flex flex-wrap items-center gap-2.5">
+        <span class="text-xs font-gaming uppercase tracking-wider text-slate-400">Meu Nick</span>
+        <input type="text" id="user-input" placeholder="Seu Nick..." class="field !w-44 font-semibold">
+        <button onclick="changeUser()" class="btn-ghost">Salvar</button>
+      </div>
+      <button onclick="openNewElementalModal()" class="btn-main self-start sm:self-auto">⚡ Novo Elemental</button>
+    </div>
+
+    <!-- Filtros e busca -->
+    <div class="panel mb-6 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 p-3.5">
+      <div class="flex items-center gap-2 overflow-x-auto pb-1 lg:pb-0">
+        <button id="btn-all" onclick="setFilter('all')" class="fbtn active"><span>Todos</span><span id="count-all" class="n">0</span></button>
+        <button id="btn-checked" onclick="setFilter('checked')" class="fbtn"><span class="text-emerald-400">✓</span><span>Obtidos</span><span id="count-checked" class="n text-emerald-400">0</span></button>
+        <button id="btn-crowned" onclick="setFilter('crowned')" class="fbtn"><span>👑</span><span>Dominados</span><span id="count-crowned" class="n text-amber-400">0</span></button>
+        <button id="btn-missing" onclick="setFilter('missing')" class="fbtn"><span class="text-amber-400">⏳</span><span>Faltando</span><span id="count-missing" class="n text-amber-400">0</span></button>
+      </div>
+
+      <div class="relative w-full lg:w-72">
+        <input type="text" placeholder="Buscar elemental ou #ID..." oninput="filterSearch(this.value)" class="field !pl-9">
+        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">🔍</span>
       </div>
     </div>
 
-    <!-- Filtros e Busca -->
-    <div class="mb-6 flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-900/40 p-3.5 rounded-2xl border border-slate-800/70 backdrop-blur-md">
-      <div class="flex items-center gap-2 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
-        <button id="btn-all" onclick="setFilter('all')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/20 flex items-center gap-1.5 transition-all">
-          <span>Todos</span>
-          <span id="count-all" class="bg-black/20 px-1.5 py-0.2 rounded text-[10px] font-mono">0</span>
-        </button>
-
-        <button id="btn-checked" onclick="setFilter('checked')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-900/80 text-slate-300 hover:bg-slate-800 hover:text-white border border-slate-800/80 flex items-center gap-1.5 transition-all">
-          <span class="text-emerald-400">✓</span>
-          <span>Obtidos</span>
-          <span id="count-checked" class="bg-slate-950/80 text-emerald-400 px-1.5 py-0.2 rounded text-[10px] font-mono">0</span>
-        </button>
-
-        <button id="btn-crowned" onclick="setFilter('crowned')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-900/80 text-slate-300 hover:bg-slate-800 hover:text-white border border-slate-800/80 flex items-center gap-1.5 transition-all">
-          <span>👑</span>
-          <span>Dominados</span>
-          <span id="count-crowned" class="bg-slate-950/80 text-amber-400 px-1.5 py-0.2 rounded text-[10px] font-mono">0</span>
-        </button>
-
-        <button id="btn-missing" onclick="setFilter('missing')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-900/80 text-slate-300 hover:bg-slate-800 hover:text-white border border-slate-800/80 flex items-center gap-1.5 transition-all">
-          <span class="text-amber-400">⏳</span>
-          <span>Faltando</span>
-          <span id="count-missing" class="bg-slate-950/80 text-amber-400 px-1.5 py-0.2 rounded text-[10px] font-mono">0</span>
-        </button>
-      </div>
-
-      <div class="relative w-full sm:w-64">
-        <input 
-          type="text" 
-          placeholder="Buscar elemental ou #ID..." 
-          oninput="filterSearch(this.value)"
-          class="w-full bg-slate-950/90 border border-slate-800/80 rounded-xl pl-8 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500/80 transition-colors"
-        >
-        <span class="absolute left-2.5 top-2 text-slate-500 text-xs">🔍</span>
-      </div>
-    </div>
-
-    <div id="empty-msg" class="hidden text-center py-16 text-slate-500 bg-slate-900/20 rounded-3xl border border-dashed border-slate-800">
+    <div id="empty-msg" class="is-hidden text-center py-16 text-slate-500 panel border-dashed">
       <p class="text-sm">Nenhum elemental corresponde aos filtros aplicados.</p>
     </div>
 
-    <!-- Grid dos Elementais -->
-    <main id="grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3.5">
-    </main>
+    <!-- Grid -->
+    <main id="grid"></main>
 
+    <footer class="text-center text-[11px] font-mono text-slate-600 mt-10 pb-4 tracking-wider">
+      ESPÍRITOS ELEMENTAIS TRACKER · fan-made
+    </footer>
   </div>
 
-  <!-- Modal de Descrição e Habilidade -->
-  <div id="info-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4" onclick="closeModal()">
-    <div class="bg-slate-900 border border-slate-700/80 max-w-md w-full rounded-3xl p-6 shadow-2xl relative" onclick="event.stopPropagation()">
-      <div class="flex items-start justify-between gap-3 mb-3">
-        <div>
-          <h3 id="modal-title" class="text-lg font-bold text-white font-gaming"></h3>
+  <!-- Modal Info -->
+  <div id="info-modal" class="modal-wrap is-hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4" onclick="closeModal()">
+    <div class="modal-box panel clip-hud max-w-md w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl" onclick="event.stopPropagation()">
+      <div class="flex items-start justify-between gap-3 mb-4">
+        <div class="min-w-0">
+          <span id="modal-id" class="text-[11px] font-mono text-slate-400"></span>
+          <h3 id="modal-title" class="font-fn text-3xl text-white leading-tight"></h3>
           <span id="modal-version"></span>
         </div>
-        <button onclick="closeModal()" class="text-slate-400 hover:text-white text-lg font-mono leading-none">&times;</button>
+        <button onclick="closeModal()" class="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
       </div>
-      <p class="text-xs text-slate-400 font-mono uppercase tracking-wider mb-2">Efeito & Habilidade:</p>
-      <p id="modal-desc" class="text-sm text-slate-200 leading-relaxed bg-slate-950/70 p-3.5 rounded-xl border border-slate-800/80"></p>
-      <div class="mt-5 text-right">
-        <button onclick="closeModal()" class="px-4 py-2 text-xs font-bold rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 uppercase tracking-wider transition-colors">Fechar</button>
+      <div class="img-box mb-4 !aspect-[16/10]" style="--c: 34,211,238">
+        <div id="modal-img" class="w-full h-full"></div>
       </div>
+      <p class="text-[11px] text-cyan-300 font-gaming uppercase tracking-[0.2em] mb-2">Efeito & Habilidade</p>
+      <p id="modal-desc" class="text-sm text-slate-200 leading-relaxed bg-black/40 p-3.5 border-l-4 border-cyan-400"></p>
+      <div class="mt-5 text-right"><button onclick="closeModal()" class="btn-ghost">Fechar</button></div>
     </div>
   </div>
 
-  <!-- Modal de Anotações Secretas Individuais -->
-  <div id="notes-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4" onclick="closeNotesModal()">
-    <div class="bg-slate-900 border border-slate-700/80 max-w-md w-full rounded-3xl p-6 shadow-2xl relative" onclick="event.stopPropagation()">
+  <!-- Modal Notas -->
+  <div id="notes-modal" class="modal-wrap is-hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4" onclick="closeNotesModal()">
+    <div class="modal-box panel clip-hud max-w-md w-full p-6 shadow-2xl" onclick="event.stopPropagation()">
       <div class="flex items-start justify-between gap-3 mb-2">
         <div>
-          <h3 class="text-md font-bold text-amber-400 font-gaming flex items-center gap-1.5">
-            <span>📝</span> Minha Anotação Pessoal
-          </h3>
+          <h3 class="font-fn text-2xl text-amber-400 flex items-center gap-2"><span>📝</span> Minha Anotação</h3>
           <p id="note-modal-title" class="text-xs text-slate-400 font-mono mt-0.5"></p>
         </div>
-        <button onclick="closeNotesModal()" class="text-slate-400 hover:text-white text-lg font-mono leading-none">&times;</button>
+        <button onclick="closeNotesModal()" class="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
       </div>
       <p class="text-[11px] text-slate-400 mb-2.5">Esta nota é estritamente sua e não pode ser vista pelos outros jogadores.</p>
-      <textarea 
-        id="note-text" 
-        rows="4" 
-        placeholder="Ex: Peguei na partida ranqueada do sábado; Combina bem com submetralhadora..." 
-        class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-slate-200 focus:outline-none focus:border-amber-400 transition-colors"
-      ></textarea>
+      <textarea id="note-text" rows="4" placeholder="Ex: Peguei na partida ranqueada do sábado; combina bem com submetralhadora..." class="field"></textarea>
       <div class="mt-4 flex justify-end gap-2">
-        <button onclick="closeNotesModal()" class="px-3.5 py-1.5 text-xs rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors">Cancelar</button>
-        <button onclick="saveNote()" class="px-4 py-1.5 text-xs font-bold rounded-xl bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 shadow-md shadow-amber-500/20 hover:brightness-110 transition-all">Salvar Anotação</button>
+        <button onclick="closeNotesModal()" class="btn-ghost">Cancelar</button>
+        <button onclick="saveNote()" class="btn-main !bg-none !bg-amber-400 !text-slate-950" style="background: linear-gradient(90deg,#f59e0b,#fde047); color:#1c1203;">Salvar</button>
       </div>
     </div>
   </div>
 
-  <!-- Modal de Criação Automática de Novo Elemental -->
-  <div id="new-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4" onclick="closeNewElementalModal()">
-    <div class="bg-slate-900 border border-slate-700/80 max-w-md w-full rounded-3xl p-6 shadow-2xl relative" onclick="event.stopPropagation()">
+  <!-- Modal Novo Elemental -->
+  <div id="new-modal" class="modal-wrap is-hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4" onclick="closeNewElementalModal()">
+    <div class="modal-box panel clip-hud max-w-md w-full max-h-[92vh] overflow-y-auto p-6 shadow-2xl" onclick="event.stopPropagation()">
       <div class="flex items-start justify-between gap-3 mb-4">
-        <h3 class="text-lg font-bold text-white font-gaming flex items-center gap-2">
-          <span>⚡</span> Cadastrar Novo Elemental
-        </h3>
-        <button onclick="closeNewElementalModal()" class="text-slate-400 hover:text-white text-lg font-mono leading-none">&times;</button>
+        <h3 class="font-fn text-2xl text-white flex items-center gap-2"><span>⚡</span> Cadastrar Novo Elemental</h3>
+        <button onclick="closeNewElementalModal()" class="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
       </div>
 
       <div class="space-y-3">
         <div>
-          <label class="block text-xs font-mono text-slate-400 mb-1">Nome do Elemental:</label>
-          <input type="text" id="new-nome" placeholder="Ex: Elemental Fênix" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-400 transition-colors">
+          <label class="block text-[11px] font-gaming uppercase tracking-wider text-slate-400 mb-1">Nome do Elemental</label>
+          <input type="text" id="new-nome" placeholder="Ex: Elemental Fênix" class="field">
         </div>
-
         <div>
-          <label class="block text-xs font-mono text-slate-400 mb-1">Versão / Tipo:</label>
-          <select id="new-versao" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-400 transition-colors">
+          <label class="block text-[11px] font-gaming uppercase tracking-wider text-slate-400 mb-1">Versão / Tipo</label>
+          <select id="new-versao" class="field">
             <option value="Normal">Normal</option>
             <option value="Dourado">Dourado</option>
             <option value="Trapaça">Trapaça</option>
@@ -863,21 +903,19 @@
             <option value="Pato">Pato</option>
           </select>
         </div>
-
         <div>
-          <label class="block text-xs font-mono text-slate-400 mb-1">Link da Imagem (URL ou caminho local):</label>
-          <input type="text" id="new-img" placeholder="Ex: img/Elemental-Fenix-Normal.jpeg ou https://..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-400 transition-colors">
+          <label class="block text-[11px] font-gaming uppercase tracking-wider text-slate-400 mb-1">Link da Imagem (URL ou caminho local)</label>
+          <input type="text" id="new-img" placeholder="Ex: img/Elemental-Fenix-Normal.jpeg ou https://..." class="field">
         </div>
-
         <div>
-          <label class="block text-xs font-mono text-slate-400 mb-1">Descrição / Habilidade:</label>
-          <textarea id="new-desc" rows="3" placeholder="Descreva o poder concedido pelo espírito..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-400 transition-colors"></textarea>
+          <label class="block text-[11px] font-gaming uppercase tracking-wider text-slate-400 mb-1">Descrição / Habilidade</label>
+          <textarea id="new-desc" rows="3" placeholder="Descreva o poder concedido pelo espírito..." class="field"></textarea>
         </div>
       </div>
 
       <div class="mt-5 flex justify-end gap-2">
-        <button onclick="closeNewElementalModal()" class="px-3.5 py-1.5 text-xs rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors">Cancelar</button>
-        <button onclick="saveNewElemental()" class="px-4 py-1.5 text-xs font-bold rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 shadow-md shadow-cyan-500/20 transition-all">Cadastrar no Sistema</button>
+        <button onclick="closeNewElementalModal()" class="btn-ghost">Cancelar</button>
+        <button onclick="saveNewElemental()" class="btn-main">Cadastrar</button>
       </div>
     </div>
   </div>
