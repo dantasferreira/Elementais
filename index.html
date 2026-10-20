@@ -305,30 +305,28 @@
       "Caçador": "v-cacador", "Travessura": "v-travessura", "Pato": "v-pato"
     };
 
-    const EXTS = ["jpeg", "jpg", "png", "webp"];
-    const stripAccents = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
-    const uniq = arr => [...new Set(arr)];
-
+    // Mapeamento preciso baseado exatamente nos arquivos da sua pasta img/
     function buildCandidates(item) {
       const list = [];
       if (item.img && item.img.trim() !== "" && item.img !== "#") list.push(item.img.trim());
 
       if (item.prefix && item.fileVariants) {
-        const pClean = item.prefix;
-        const pNoAcc = stripAccents(pClean);
-        const prefixes = uniq([pClean, cap(pClean), pClean.toLowerCase(), pNoAcc, cap(pNoAcc)]);
-        
-        EXTS.forEach(ext => {
-          prefixes.forEach(p => {
-            item.fileVariants.forEach(v => {
-              list.push(`img/Elemental-${p}-${v}.${ext}`);
-              list.push(`img/elemental-${p}-${v}.${ext}`);
-            });
-          });
+        const prefix = item.prefix; // Ex: "Espírito", "aniversario", "Aventura"
+        item.fileVariants.forEach(variant => {
+          // Variações exatas (com acento, sem acento, cacador/caçador, trapaca/trapaça)
+          list.push(`img/Elemental-${prefix}-${variant}.jpeg`);
+          list.push(`img/Elemental-${prefix}-${variant}.jpg`);
+          list.push(`img/Elemental-${prefix}-${variant}.png`);
+          
+          if (variant === "Caçador") {
+            list.push(`img/Elemental-${prefix}-Cacador.jpeg`);
+          }
+          if (variant === "Trapaça") {
+            list.push(`img/Elemental-${prefix}-Trapaca.jpeg`);
+          }
         });
       }
-      return uniq(list).map(p => /^https?:\/\//i.test(p) ? p : encodeURI(p));
+      return [...new Set(list)];
     }
 
     let elementaisData = [];
@@ -372,7 +370,6 @@
       box.innerHTML = `<div class="no-img" title="Imagem não encontrada para ${item.nome} (${item.versao})"><span class="icon">👾</span><span>Sem imagem</span></div>`;
     }
 
-    // Carregamento direto otimizado (sem IntersectionObserver)
     function loadImageInto(box, item) {
       const candidates = buildCandidates(item);
       if (candidates.length === 0) {
@@ -386,8 +383,6 @@
 
       const img = new Image();
       img.alt = `${item.nome} ${item.versao}`;
-      img.loading = 'lazy';
-      img.decoding = 'async';
       let idx = 0;
 
       img.onload = () => {
