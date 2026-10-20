@@ -256,7 +256,7 @@
     const auth = getAuth(app);
 
     let currentUid = null;
-    let currentNick = localStorage.getItem('fortnite_elementais_nick') || 'Jogador';
+    let currentNick = localStorage.getItem('fortnite_elementais_nick') || 'Rodrigo';
 
     const IDS_OCULTOS = [28,35,63,56,49,70,77,84,91,93,94,95,96,97,98,105,112,119,126,133,140,147,175,182,189,161,154];
 
@@ -315,10 +315,16 @@
       if (item.img && item.img.trim() !== "" && item.img !== "#") list.push(item.img.trim());
 
       if (item.prefix && item.fileVariants) {
-        const prefixes = uniq([item.prefix, cap(item.prefix), item.prefix.toLowerCase(), stripAccents(item.prefix), cap(stripAccents(item.prefix))]);
+        const pClean = item.prefix;
+        const pNoAcc = stripAccents(pClean);
+        const prefixes = uniq([pClean, cap(pClean), pClean.toLowerCase(), pNoAcc, cap(pNoAcc)]);
+        
         EXTS.forEach(ext => {
           prefixes.forEach(p => {
-            item.fileVariants.forEach(v => list.push(`img/Elemental-${p}-${v}.${ext}`));
+            item.fileVariants.forEach(v => {
+              list.push(`img/Elemental-${p}-${v}.${ext}`);
+              list.push(`img/elemental-${p}-${v}.${ext}`);
+            });
           });
         });
       }
@@ -589,7 +595,7 @@
         document.getElementById('current-username-display').innerText = currentNick.toUpperCase();
         document.getElementById('user-input').value = currentNick;
 
-        // Salva o registro do usuário para listagem de comparação
+        // Salva/atualiza o registro do usuário para listagem pública de comparação
         set(ref(db, `users_registry/${currentUid}`), { nick: currentNick });
 
         const userRef = ref(db, `user_data/${currentUid}`);
@@ -639,55 +645,73 @@
     window.openCompareModal = async () => {
       const listEl = document.getElementById('compare-users-list');
       listEl.innerHTML = '<p class="text-xs text-slate-400">Carregando usuários...</p>';
+      document.getElementById('compare-title').innerText = '';
+      document.getElementById('compare-content').innerHTML = '';
       document.getElementById('compare-modal').classList.remove('is-hidden');
 
-      const snapshot = await get(ref(db, 'users_registry'));
-      const registry = snapshot.val() || {};
+      try {
+        const snapshot = await get(ref(db, 'users_registry'));
+        const registry = snapshot.val() || {};
 
-      listEl.innerHTML = '';
-      const uids = Object.keys(registry);
-      if (uids.length === 0) {
-        listEl.innerHTML = '<p class="text-xs text-slate-400">Nenhum outro usuário registrado ainda.</p>';
-        return;
+        listEl.innerHTML = '';
+        const uids = Object.keys(registry);
+        if (uids.length === 0) {
+          listEl.innerHTML = '<p class="text-xs text-slate-400">Nenhum outro usuário registrado ainda.</p>';
+          return;
+        }
+
+        uids.forEach(uid => {
+          // Ignora o próprio usuário atual na lista de comparação, se preferir ver os outros
+          if (uid === currentUid) return;
+          const uInfo = registry[uid] || {};
+          const btn = document.createElement('button');
+          btn.className = 'btn-ghost w-full text-left flex justify-between items-center mb-2';
+          btn.innerHTML = `<span>👤 ${uInfo.nick || 'Jogador'}</span> <span class="text-xs text-cyan-300">Comparar →</span>`;
+          btn.onclick = () => loadUserComparison(uid, uInfo.nick || 'Jogador');
+          listEl.appendChild(btn);
+        });
+
+        if (listEl.children.length === 0) {
+          listEl.innerHTML = '<p class="text-xs text-slate-400">Cadastre outros nicks para comparar.</p>';
+        }
+      } catch (err) {
+        listEl.innerHTML = '<p class="text-xs text-rose-400">Erro ao carregar lista de usuários do Firebase.</p>';
       }
-
-      uids.forEach(uid => {
-        const uInfo = registry[uid];
-        const btn = document.createElement('button');
-        btn.className = 'btn-ghost w-full text-left flex justify-between items-center mb-2';
-        btn.innerHTML = `<span>👤 ${uInfo.nick || 'Jogador'}</span> <span class="text-xs text-cyan-300">Comparar →</span>`;
-        btn.onclick = () => loadUserComparison(uid, uInfo.nick);
-        listEl.appendChild(btn);
-      });
     };
 
     async function loadUserComparison(uid, nick) {
       document.getElementById('compare-title').innerText = `Comparando com: ${nick}`;
       const contentEl = document.getElementById('compare-content');
-      contentEl.innerHTML = '<p class="text-xs text-slate-400">Buscando dados...</p>';
+      contentEl.innerHTML = '<p class="text-xs text-slate-400">Buscando dados de elemental...</p>';
 
-      const snapshot = await get(ref(db, `user_data/${uid}`));
-      const targetState = snapshot.val() || {};
+      try {
+        const snapshot = await get(ref(db, `user_data/${uid}`));
+        const targetState = snapshot.val() || {};
 
-      let commonCount = 0;
-      let targetOnly = 0;
-      let myOnly = 0;
+        let commonCount = 0;
+        let targetOnly = 0;
+        let myOnly = 0;
 
-      elementaisData.filter(x => !x.hidden).forEach(item => {
-        const mySt = getItemStatus(item.id).captured;
-        const targetSt = Boolean(targetState[item.id]?.captured || targetState[item.id] === true);
-        if (mySt && targetSt) commonCount++;
-        else if (targetSt) targetOnly++;
-        else if (mySt) myOnly++;
-      });
+        elementaisData.filter(x => !x.hidden).forEach(item => {
+          const mySt = getItemStatus(item.id).captured;
+          const rawTarget = targetState[item.id];
+          const targetSt = typeof rawTarget === 'boolean' ? rawTarget : Boolean(rawTarget?.captured);
 
-      contentEl.innerHTML = `
-        <div class="space-y-2 text-xs font-mono bg-black/40 p-4 border border-indigo-500/30">
-          <p class="text-emerald-400 font-bold">✓ Obtidos em comum: ${commonCount}</p>
-          <p class="text-cyan-300 font-bold">🎯 Apenas ${nick} tem: ${targetOnly}</p>
-          <p class="text-amber-400 font-bold">⚡ Apenas você tem: ${myOnly}</p>
-        </div>
-      `;
+          if (mySt && targetSt) commonCount++;
+          else if (targetSt) targetOnly++;
+          else if (mySt) myOnly++;
+        });
+
+        contentEl.innerHTML = `
+          <div class="space-y-2 text-xs font-mono bg-black/40 p-4 border border-indigo-500/30">
+            <p class="text-emerald-400 font-bold">✓ Obtidos em comum: ${commonCount}</p>
+            <p class="text-cyan-300 font-bold">🎯 Apenas ${nick} tem: ${targetOnly}</p>
+            <p class="text-amber-400 font-bold">⚡ Apenas você tem: ${myOnly}</p>
+          </div>
+        `;
+      } catch (err) {
+        contentEl.innerHTML = '<p class="text-xs text-rose-400">Erro ao puxar dados do usuário selecionado.</p>';
+      }
     }
 
     window.closeCompareModal = () => {
