@@ -579,7 +579,6 @@
       if (user) {
         currentUid = user.uid;
         
-        // Verifica se já existe um UID salvo no Firebase para este Nick
         try {
           const snapshot = await get(ref(db, 'users_registry'));
           const registry = snapshot.val() || {};
@@ -589,10 +588,8 @@
           );
 
           if (foundEntry) {
-            // Se já existe um usuário cadastrado com esse nick, usa o UID antigo dele!
             currentUid = foundEntry[0];
           } else {
-            // Se é novo, registra com o UID atual da sessão anônima
             set(ref(db, `users_registry/${currentUid}`), { nick: currentNick });
           }
         } catch (e) {
@@ -618,7 +615,6 @@
       localStorage.setItem('fortnite_elementais_nick', currentNick);
       document.getElementById('current-username-display').innerText = currentNick.toUpperCase();
 
-      // Procura se o nick inserido já existe no banco
       const snapshot = await get(ref(db, 'users_registry'));
       const registry = snapshot.val() || {};
       const foundEntry = Object.entries(registry).find(([uid, info]) => 
@@ -711,24 +707,43 @@
         const targetState = snapshot.val() || {};
 
         let commonCount = 0;
-        let targetOnly = 0;
-        let myOnly = 0;
+        let targetOnlyCount = 0;
+        let myOnlyCount = 0;
+        let missingListHtml = '';
 
         elementaisData.filter(x => !x.hidden).forEach(item => {
           const mySt = getItemStatus(item.id).captured;
           const rawTarget = targetState[item.id];
           const targetSt = typeof rawTarget === 'boolean' ? rawTarget : Boolean(rawTarget?.captured);
 
-          if (mySt && targetSt) commonCount++;
-          else if (targetSt) targetOnly++;
-          else if (mySt) myOnly++;
+          if (mySt && targetSt) {
+            commonCount++;
+          } else if (targetSt) {
+            targetOnlyCount++;
+            missingListHtml += `
+              <div class="flex items-center justify-between bg-slate-900/80 p-2 border border-cyan-500/20 text-xs">
+                <span class="text-slate-200 font-medium">#${item.id} - ${item.nome}</span>
+                <span class="tag text-[9px] font-bold px-1.5 py-0.5 uppercase tracking-wider font-gaming ${item.badgeClass}">${item.versao}</span>
+              </div>
+            `;
+          } else if (mySt) {
+            myOnlyCount++;
+          }
         });
 
         contentEl.innerHTML = `
-          <div class="space-y-2 text-xs font-mono bg-black/40 p-4 border border-indigo-500/30">
-            <p class="text-emerald-400 font-bold">✓ Obtidos em comum: ${commonCount}</p>
-            <p class="text-cyan-300 font-bold">🎯 Apenas ${nick} tem: ${targetOnly}</p>
-            <p class="text-amber-400 font-bold">⚡ Apenas você tem: ${myOnly}</p>
+          <div class="space-y-3">
+            <div class="space-y-1 text-xs font-mono bg-black/40 p-3 border border-indigo-500/30">
+              <p class="text-emerald-400 font-bold">✓ Obtidos em comum: ${commonCount}</p>
+              <p class="text-cyan-300 font-bold">🎯 Faltando para você (que ${nick} tem): ${targetOnlyCount}</p>
+              <p class="text-amber-400 font-bold">⚡ Apenas você tem: ${myOnlyCount}</p>
+            </div>
+            <div>
+              <p class="text-xs text-cyan-300 font-gaming uppercase tracking-wider mb-2">Elementais que ${nick} tem e você NÃO tem:</p>
+              <div class="max-h-44 overflow-y-auto space-y-1.5 pr-1">
+                ${missingListHtml || '<p class="text-xs text-slate-500 italic">Nenhum elemental faltando (você tem todos os que ele possui).</p>'}
+              </div>
+            </div>
           </div>
         `;
       } catch (err) {
@@ -930,12 +945,12 @@
 
   <!-- Modal Comparação -->
   <div id="compare-modal" class="modal-wrap is-hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4" onclick="closeCompareModal()">
-    <div class="modal-box panel clip-hud max-w-md w-full p-6 shadow-2xl" onclick="event.stopPropagation()">
+    <div class="modal-box panel clip-hud max-w-lg w-full p-6 shadow-2xl" onclick="event.stopPropagation()">
       <div class="flex items-start justify-between gap-3 mb-4">
         <h3 class="font-fn text-2xl text-white flex items-center gap-2"><span>👥</span> Comparar Coleção</h3>
         <button onclick="closeCompareModal()" class="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
       </div>
-      <div id="compare-users-list" class="mb-4 max-h-40 overflow-y-auto"></div>
+      <div id="compare-users-list" class="mb-4 max-h-36 overflow-y-auto"></div>
       <div id="compare-title" class="text-sm text-cyan-300 font-gaming mb-2"></div>
       <div id="compare-content"></div>
       <div class="mt-5 text-right"><button onclick="closeCompareModal()" class="btn-ghost">Fechar</button></div>
