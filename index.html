@@ -372,6 +372,7 @@
       box.innerHTML = `<div class="no-img" title="Imagem não encontrada para ${item.nome} (${item.versao})"><span class="icon">👾</span><span>Sem imagem</span></div>`;
     }
 
+    // Carregamento direto otimizado (sem IntersectionObserver)
     function loadImageInto(box, item) {
       const candidates = buildCandidates(item);
       if (candidates.length === 0) {
@@ -410,16 +411,6 @@
       };
       img.src = candidates[0];
     }
-
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
-        const box = entry.target;
-        io.unobserve(box);
-        const item = elementaisData.find(x => x.id === Number(box.dataset.id));
-        if (item) loadImageInto(box, item);
-      });
-    }, { rootMargin: '300px' });
 
     function renderCard(item) {
       let card = document.getElementById(`card-${item.id}`);
@@ -470,7 +461,7 @@
           im.className = 'loaded';
           box.appendChild(im);
         } else {
-          io.observe(box);
+          loadImageInto(box, item);
         }
       }
     }
@@ -595,7 +586,6 @@
         document.getElementById('current-username-display').innerText = currentNick.toUpperCase();
         document.getElementById('user-input').value = currentNick;
 
-        // Salva/atualiza o registro do usuário para listagem pública de comparação
         set(ref(db, `users_registry/${currentUid}`), { nick: currentNick });
 
         const userRef = ref(db, `user_data/${currentUid}`);
@@ -641,7 +631,6 @@
       });
     };
 
-    // Funcionalidade de Comparação de Usuários
     window.openCompareModal = async () => {
       const listEl = document.getElementById('compare-users-list');
       listEl.innerHTML = '<p class="text-xs text-slate-400">Carregando usuários...</p>';
@@ -661,7 +650,6 @@
         }
 
         uids.forEach(uid => {
-          // Ignora o próprio usuário atual na lista de comparação, se preferir ver os outros
           if (uid === currentUid) return;
           const uInfo = registry[uid] || {};
           const btn = document.createElement('button');
