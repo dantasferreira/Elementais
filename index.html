@@ -305,15 +305,13 @@
       "Caçador": "v-cacador", "Travessura": "v-travessura", "Pato": "v-pato"
     };
 
-    // Mapeamento preciso baseado exatamente nos arquivos da sua pasta img/
     function buildCandidates(item) {
       const list = [];
       if (item.img && item.img.trim() !== "" && item.img !== "#") list.push(item.img.trim());
 
       if (item.prefix && item.fileVariants) {
-        const prefix = item.prefix; // Ex: "Espírito", "aniversario", "Aventura"
+        const prefix = item.prefix;
         item.fileVariants.forEach(variant => {
-          // Variações exatas (com acento, sem acento, cacador/caçador, trapaca/trapaça)
           list.push(`img/Elemental-${prefix}-${variant}.jpeg`);
           list.push(`img/Elemental-${prefix}-${variant}.jpg`);
           list.push(`img/Elemental-${prefix}-${variant}.png`);
@@ -575,29 +573,70 @@
       console.error("Erro na autenticação anônima:", error);
     });
 
-    onAuthStateChanged(auth, (user) => {
+    let activeDataListener = null;
+
+    onAuthStateChanged(auth, async (user) => {
       if (user) {
         currentUid = user.uid;
+        
+        // Verifica se já existe um UID salvo no Firebase para este Nick
+        try {
+          const snapshot = await get(ref(db, 'users_registry'));
+          const registry = snapshot.val() || {};
+          
+          const foundEntry = Object.entries(registry).find(([uid, info]) => 
+            info.nick && info.nick.toLowerCase() === currentNick.toLowerCase()
+          );
+
+          if (foundEntry) {
+            // Se já existe um usuário cadastrado com esse nick, usa o UID antigo dele!
+            currentUid = foundEntry[0];
+          } else {
+            // Se é novo, registra com o UID atual da sessão anônima
+            set(ref(db, `users_registry/${currentUid}`), { nick: currentNick });
+          }
+        } catch (e) {
+          console.error("Erro ao sincronizar nick:", e);
+        }
+
         document.getElementById('current-username-display').innerText = currentNick.toUpperCase();
         document.getElementById('user-input').value = currentNick;
 
-        set(ref(db, `users_registry/${currentUid}`), { nick: currentNick });
-
+        if (activeDataListener) activeDataListener();
         const userRef = ref(db, `user_data/${currentUid}`);
-        onValue(userRef, (snapshot) => {
+        activeDataListener = onValue(userRef, (snapshot) => {
           userState = snapshot.val() || {};
           updateUserView();
         });
       }
     });
 
-    window.changeUser = () => {
+    window.changeUser = async () => {
       const inputVal = document.getElementById('user-input').value.trim();
-      if (!inputVal || !currentUid) return;
+      if (!inputVal) return;
       currentNick = inputVal;
       localStorage.setItem('fortnite_elementais_nick', currentNick);
       document.getElementById('current-username-display').innerText = currentNick.toUpperCase();
-      set(ref(db, `users_registry/${currentUid}`), { nick: currentNick });
+
+      // Procura se o nick inserido já existe no banco
+      const snapshot = await get(ref(db, 'users_registry'));
+      const registry = snapshot.val() || {};
+      const foundEntry = Object.entries(registry).find(([uid, info]) => 
+        info.nick && info.nick.toLowerCase() === currentNick.toLowerCase()
+      );
+
+      if (foundEntry) {
+        currentUid = foundEntry[0];
+      } else {
+        set(ref(db, `users_registry/${currentUid}`), { nick: currentNick });
+      }
+
+      if (activeDataListener) activeDataListener();
+      const userRef = ref(db, `user_data/${currentUid}`);
+      activeDataListener = onValue(userRef, (snapshot) => {
+        userState = snapshot.val() || {};
+        updateUserView();
+      });
     };
 
     window.toggleItem = (id) => {
