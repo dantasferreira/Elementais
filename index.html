@@ -293,7 +293,7 @@
       { nome: "Elemental Crash", img: "Crash", desc: "Ao saltar, gira e da dano circular ao redor." },
       { nome: "Elemental Morgana", img: "Morgana", desc: "Aumenta a eficácia dos itens de cura" },
       { nome: "Elemental Aniversário", img: "aniversario", desc: "Abrir baús tem uma chance de gerar um pedaço de bolo. Eliminações podem gerar bolo no nível máximo." },
-      { nome: "Elemental Salgueiro dos Desejos", img: "Salgueiro", desc: "Ao eliminar outros jogadores, extraia os Sprites que eles estiverem equipando. Afaste tudo ao sofrer dano. Fica irritado ao ser removido e marca você no mapa." },
+      { nome: "Elemental Salgueiro dos Desejos", alias: "Elemental Salgueiro", img: "Salgueiro", desc: "Ao eliminar outros jogadores, extraia os Sprites que eles estiverem equipando. Afaste tudo ao sofrer dano. Fica irritado ao ser removido e marca você no mapa." },
       { nome: "Elemental Mel", img: "Mel", desc: "Chance de gerar abelhas no local do acerto ao causar dano com uma arma de longo alcance" },
       { nome: "Elemental Corrida Assustadora", img: "Corrida", desc: "(Ativa - Salto no Ar) Spooky Dash permite atravessar certos objetos. Acumule cargas com o passar do tempo. O tempo de recarga das cargas diminui a cada subida de nível!" },
       { nome: "Elemental Vampiro", img: "Vampiro", desc: "Recupere vida ao causar dano a um inimigo. A porcentagem de vida recuperada aumenta a cada subida de nível!" },
@@ -316,7 +316,175 @@
       "Caçador": "v-cacador", "Travessura": "v-travessura", "Pato": "v-pato"
     };
 
-    /* ---------- Resolução inteligente de imagens ----------
+    // Link de cada imagem (mesmo mapa do código original)
+    const imageMap = {
+      "Elemental Aventura-Normal": "img/Elemental-Aventura-Normal.jpeg",
+      "Elemental Aventura-Dourado": "img/Elemental-Aventura-Dourado.jpeg",
+      "Elemental Aventura-Trapaça": "img/Elemental-Aventura-Trapaça.jpeg",
+      "Elemental Aventura-Hacker": "img/Elemental-Aventura-Hacker.jpeg",
+      "Elemental Aventura-Caçador": "img/Elemental-Aventura-Cacador.jpeg",
+      "Elemental Aventura-Travessura": "img/Elemental-Aventura-Travessura.jpeg",
+      "Elemental Aventura-Pato": "img/Elemental-Aventura-Pato.jpeg",
+      "Elemental Guarda da Moita-Normal": "img/Elemental-Moita-Normal.jpeg",
+      "Elemental Guarda da Moita-Dourado": "img/Elemental-Moita-Dourado.jpeg",
+      "Elemental Guarda da Moita-Trapaça": "img/Elemental-Moita-Trapaça.jpeg",
+      "Elemental Guarda da Moita-Hacker": "img/Elemental-Moita-Hacker.jpeg",
+      "Elemental Guarda da Moita-Caçador": "img/Elemental-Moita-Cacador.jpeg",
+      "Elemental Guarda da Moita-Travessura": "img/Elemental-Moita-Travessura.jpeg",
+      "Elemental Guarda da Moita-Pato": "img/Elemental-Moita-Pato.jpeg",
+      "Elemental Jonesy-Normal": "img/Elemental-Jonesy-Normal.jpeg",
+      "Elemental Jonesy-Dourado": "img/Elemental-Jonesy-Dourado.jpeg",
+      "Elemental Jonesy-Trapaça": "img/Elemental-Jonesy-Trapaça.jpeg",
+      "Elemental Jonesy-Hacker": "img/Elemental-Jonesy-Hacker.jpeg",
+      "Elemental Jonesy-Caçador": "img/Elemental-Jonesy-Cacador.jpeg",
+      "Elemental Jonesy-Travessura": "img/Elemental-Jonesy-Travessura.jpeg",
+      "Elemental Jonesy-Pato": "img/Elemental-Jonesy-Pato.jpeg",
+      "Elemental Sonic-Normal": "img/Elemental-Sonic-Normal.jpeg",
+      "Elemental Sonic-Dourado": "img/Elemental-Sonic-Dourado.jpeg",
+      "Elemental Sonic-Trapaça": "img/Elemental-Sonic-Trapaça.jpeg",
+      "Elemental Sonic-Hacker": "img/Elemental-Sonic-Hacker.jpeg",
+      "Elemental Sonic-Caçador": "img/Elemental-Sonic-Cacador.jpeg",
+      "Elemental Sonic-Travessura": "img/Elemental-Sonic-Travessura.jpeg",
+      "Elemental Tails-Normal": "img/Elemental-Tails-Normal.jpeg",
+      "Elemental Tails-Dourado": "img/Elemental-Tails-Dourado.jpeg",
+      "Elemental Tails-Trapaça": "img/Elemental-Tails-Trapaça.jpeg",
+      "Elemental Tails-Hacker": "img/Elemental-Tails-Hacker.jpeg",
+      "Elemental Tails-Caçador": "img/Elemental-Tails-Cacador.jpeg",
+      "Elemental Tails-Travessura": "img/Elemental-Tails-Travessura.jpeg",
+      "Elemental Shadow-Normal": "img/Elemental-Shadow-Normal.jpeg",
+      "Elemental Shadow-Dourado": "img/Elemental-Shadow-Dourado.jpeg",
+      "Elemental Shadow-Trapaça": "img/Elemental-Shadow-Trapaça.jpeg",
+      "Elemental Shadow-Hacker": "img/Elemental-Shadow-Hacker.jpeg",
+      "Elemental Shadow-Caçador": "img/Elemental-Shadow-Cacador.jpeg",
+      "Elemental Shadow-Travessura": "img/Elemental-Shadow-Travessura.jpeg",
+      "Elemental 8-Bits-Normal": "img/Elemental-8-Bits-Normal.jpeg",
+      "Elemental 8-Bits-Dourado": "img/Elemental-8-Bits-Dourado.jpeg",
+      "Elemental 8-Bits-Trapaça": "img/Elemental-8-Bits-Trapaça.jpeg",
+      "Elemental 8-Bits-Hacker": "img/Elemental-8-Bits-Hacker.jpeg",
+      "Elemental 8-Bits-Caçador": "img/Elemental-8-Bits-Cacador.jpeg",
+      "Elemental 8-Bits-Travessura": "img/Elemental-8-Bits-Travessura.jpeg",
+      "Elemental Jackrabbit-Normal": "img/Elemental-Jackrabbit-Normal.jpeg",
+      "Elemental Jackrabbit-Dourado": "img/Elemental-Jackrabbit-Dourado.jpeg",
+      "Elemental Jackrabbit-Trapaça": "img/Elemental-Jackrabbit-Trapaça.jpeg",
+      "Elemental Jackrabbit-Hacker": "img/Elemental-Jackrabbit-Hacker.jpeg",
+      "Elemental Jackrabbit-Caçador": "img/Elemental-Jackrabbit-Cacador.jpeg",
+      "Elemental Jackrabbit-Travessura": "img/Elemental-Jackrabbit-Travessura.jpeg",
+      "Elemental Coroa (Crown)-Normal": "img/Elemental-Coroa-Normal.jpeg",
+      "Elemental Coroa (Crown)-Dourado": "img/Elemental-Coroa-Dourado.jpeg",
+      "Elemental Coroa (Crown)-Trapaça": "img/Elemental-Coroa-Trapaça.jpeg",
+      "Elemental Coroa (Crown)-Hacker": "img/Elemental-Coroa-Hacker.jpeg",
+      "Elemental Coroa (Crown)-Caçador": "img/Elemental-Coroa-Cacador.jpeg",
+      "Elemental Coroa (Crown)-Travessura": "img/Elemental-Coroa-Travessura.jpeg",
+      "Elemental Disruptor-Normal": "img/Elemental-Disruptor-Normal.jpeg",
+      "Elemental Disruptor-Dourado": "img/Elemental-Disruptor-Dourado.jpeg",
+      "Elemental Disruptor-Trapaça": "img/Elemental-Disruptor-Trapaça.jpeg",
+      "Elemental Disruptor-Hacker": "img/Elemental-Disruptor-Hacker.jpeg",
+      "Elemental Disruptor-Caçador": "img/Elemental-Disruptor-Cacador.jpeg",
+      "Elemental Disruptor-Travessura": "img/Elemental-Disruptor-Travessura.jpeg",
+      "Elemental Klimbo-Normal": "img/Elemental-Klimbo-Normal.jpeg",
+      "Elemental Klimbo-Dourado": "img/Elemental-Klimbo-Dourado.jpeg",
+      "Elemental Klimbo-Trapaça": "img/Elemental-Klimbo-Trapaça.jpeg",
+      "Elemental Klimbo-Hacker": "img/Elemental-Klimbo-Hacker.jpeg",
+      "Elemental Klimbo-Caçador": "img/Elemental-Klimbo-Cacador.jpeg",
+      "Elemental Klimbo-Travessura": "img/Elemental-Klimbo-Travessura.jpeg",
+      "Elemental Klimbo-Pato": "img/Elemental-Klimbo-Pato.jpeg",
+      "Elemental Raio X-Normal": "img/Elemental-Raio-X-Normal.jpeg",
+      "Elemental Raio X-Dourado": "img/Elemental-Raio-X-Dourado.jpeg",
+      "Elemental Raio X-Trapaça": "img/Elemental-Raio-X-Trapaça.jpeg",
+      "Elemental Raio X-Hacker": "img/Elemental-Raio-X-Hacker.jpeg",
+      "Elemental Raio X-Caçador": "img/Elemental-Raio-X-Cacador.jpeg",
+      "Elemental Raio X-Travessura": "img/Elemental-Raio-X-Travessura.jpeg",
+      "Elemental Onigiri-Normal": "img/Elemental-Onigiri-Normal.jpeg",
+      "Elemental Onigiri-Dourado": "img/Elemental-Onigiri-Dourado.jpeg",
+      "Elemental Onigiri-Trapaça": "img/Elemental-Onigiri-Trapaça.jpeg",
+      "Elemental Onigiri-Hacker": "img/Elemental-Onigiri-Hacker.jpeg",
+      "Elemental Onigiri-Caçador": "img/Elemental-Onigiri-Cacador.jpeg",
+      "Elemental Onigiri-Travessura": "img/Elemental-Onigiri-Travessura.jpeg",
+      "Elemental Mega Man-Normal": "img/Elemental-Mega-Man-Normal.jpeg",
+      "Elemental Sobreescudo-Normal": "img/Elemental-Sobreescudo-Normal.jpeg",
+      "Elemental Sobreescudo-Dourado": "img/Elemental-Sobreescudo-Dourado.jpeg",
+      "Elemental Sobreescudo-Trapaça": "img/Elemental-Sobreescudo-Trapaça.jpeg",
+      "Elemental Sobreescudo-Hacker": "img/Elemental-Sobreescudo-Hacker.jpeg",
+      "Elemental Sobreescudo-Caçador": "img/Elemental-Sobreescudo-Cacador.jpeg",
+      "Elemental Sobreescudo-Travessura": "img/Elemental-Sobreescudo-Travessura.jpeg",
+      "Elemental Storm Scout-Normal": "img/Elemental-Storm-Scout-Normal.jpeg",
+      "Elemental Storm Scout-Dourado": "img/Elemental-Storm-Scout-Dourado.jpeg",
+      "Elemental Storm Scout-Trapaça": "img/Elemental-Storm-Scout-Trapaça.jpeg",
+      "Elemental Storm Scout-Hacker": "img/Elemental-Storm-Scout-Hacker.jpeg",
+      "Elemental Storm Scout-Caçador": "img/Elemental-Storm-Scout-Cacador.jpeg",
+      "Elemental Storm Scout-Travessura": "img/Elemental-Storm-Scout-Travessura.jpeg",
+      "Elemental Lagoa-Normal": "img/Elemental-Lagoa-Normal.jpeg",
+      "Elemental Lagoa-Dourado": "img/Elemental-Lagoa-Dourado.jpeg",
+      "Elemental Lagoa-Trapaça": "img/Elemental-Lagoa-Trapaça.jpeg",
+      "Elemental Lagoa-Hacker": "img/Elemental-Lagoa-Hacker.jpeg",
+      "Elemental Lagoa-Caçador": "img/Elemental-Lagoa-Cacador.jpeg",
+      "Elemental Lagoa-Travessura": "img/Elemental-Lagoa-Travessura.jpeg",
+      "Elemental Blinky-Normal": "img/Elemental-Blinky-Normal.jpeg",
+      "Elemental Blinky-Dourado": "img/Elemental-Blinky-Dourado.jpeg",
+      "Elemental Blinky-Trapaça": "img/Elemental-Blinky-Trapaça.jpeg",
+      "Elemental Blinky-Hacker": "img/Elemental-Blinky-Hacker.jpeg",
+      "Elemental Blinky-Caçador": "img/Elemental-Blinky-Cacador.jpeg",
+      "Elemental Blinky-Travessura": "img/Elemental-Blinky-Travessura.jpeg",
+      "Elemental Crash-Normal": "img/Elemental-Crash-Normal.jpeg",
+      "Elemental Crash-Dourado": "img/Elemental-Crash-Dourado.jpeg",
+      "Elemental Crash-Trapaça": "img/Elemental-Crash-Trapaça.jpeg",
+      "Elemental Crash-Hacker": "img/Elemental-Crash-Hacker.jpeg",
+      "Elemental Crash-Caçador": "img/Elemental-Crash-Cacador.jpeg",
+      "Elemental Crash-Travessura": "img/Elemental-Crash-Travessura.jpeg",
+      "Elemental Morgana-Normal": "img/Elemental-Morgana-Normal.jpeg",
+      "Elemental Morgana-Dourado": "img/Elemental-Morgana-Dourado.jpeg",
+      "Elemental Morgana-Trapaça": "img/Elemental-Morgana-Trapaca.jpeg",
+      "Elemental Morgana-Hacker": "img/Elemental-Morgana-Hacker.jpeg",
+      "Elemental Morgana-Caçador": "img/Elemental-Morgana-Cacador.jpeg",
+      "Elemental Morgana-Travessura": "img/Elemental-Morgana-Travessura.jpeg",
+      "Elemental Aniversário-Normal": "img/Elemental-aniversario-Normal.jpeg",
+      "Elemental Aniversário-Dourado": "img/Elemental-aniversario-Dourado.jpeg",
+      "Elemental Aniversário-Trapaça": "img/Elemental-aniversario-Trapaca.jpeg",
+      "Elemental Aniversário-Hacker": "img/Elemental-aniversario-Hacker.jpeg",
+      "Elemental Aniversário-Caçador": "img/Elemental-aniversario-Cacador.jpeg",
+      "Elemental Aniversário-Travessura": "img/Elemental-aniversario-Travessura.jpeg",
+      "Elemental Corrida Assustadora-Normal": "img/Elemental-Corrida-Normal.jpeg",
+      "Elemental Corrida Assustadora-Dourado": "img/Elemental-Corrida-Dourado.jpeg",
+      "Elemental Corrida Assustadora-Trapaça": "img/Elemental-Corrida-Trapaça.jpeg",
+      "Elemental Corrida Assustadora-Hacker": "img/Elemental-Corrida-Hacker.jpeg",
+      "Elemental Corrida Assustadora-Caçador": "img/Elemental-Corrida-Cacador.jpeg",
+      "Elemental Corrida Assustadora-Travessura": "img/Elemental-Corrida-Travessura.jpeg",
+      "Elemental Corrida Assustadora-Pato": "img/Elemental-Corrida-Pato.jpeg",
+      "Elemental Vampiro-Normal": "img/Elemental-Vampiro-Normal.jpeg",
+      "Elemental Vampiro-Dourado": "img/Elemental-Vampiro-Dourado.jpeg",
+      "Elemental Vampiro-Trapaça": "img/Elemental-Vampiro-Trapaça.jpeg",
+      "Elemental Vampiro-Hacker": "img/Elemental-Vampiro-Hacker.jpeg",
+      "Elemental Vampiro-Caçador": "img/Elemental-Vampiro-Cacador.jpeg",
+      "Elemental Vampiro-Travessura": "img/Elemental-Vampiro-Travessura.jpeg",
+      "Elemental Espírito do Cervo-Normal": "img/Elemental-Espírito-Normal.jpeg",
+      "Elemental Espírito do Cervo-Dourado": "img/Elemental-Espírito-Dourado.jpeg",
+      "Elemental Espírito do Cervo-Trapaça": "img/Elemental-Espírito-Trapaça.jpeg",
+      "Elemental Espírito do Cervo-Hacker": "img/Elemental-Espírito-Hacker.jpeg",
+      "Elemental Espírito do Cervo-Caçador": "img/Elemental-Espírito-Cacador.jpeg",
+      "Elemental Espírito do Cervo-Travessura": "img/Elemental-Espírito-Travessura.jpeg",
+      "Elemental Mergulho no Lixo-Normal": "img/Elemental-Mergulho-Normal.jpeg",
+      "Elemental Mergulho no Lixo-Dourado": "img/Elemental-Mergulho-Dourado.jpeg",
+      "Elemental Mergulho no Lixo-Trapaça": "img/Elemental-Mergulho-Trapaça.jpeg",
+      "Elemental Mergulho no Lixo-Hacker": "img/Elemental-Mergulho-Hacker.jpeg",
+      "Elemental Mergulho no Lixo-Caçador": "img/Elemental-Mergulho-Cacador.jpeg",
+      "Elemental Mergulho no Lixo-Travessura": "img/Elemental-Mergulho-Travessura.jpeg",
+      "Elemental Mel-Normal": "img/Elemental-Mel-Normal.jpeg",
+      "Elemental Mel-Dourado": "img/Elemental-Mel-Dourado.jpeg",
+      "Elemental Mel-Trapaça": "img/Elemental-Mel-Trapaça.jpeg",
+      "Elemental Mel-Hacker": "img/Elemental-Mel-Hacker.jpeg",
+      "Elemental Mel-Caçador": "img/Elemental-Mel-Cacador.jpeg",
+      "Elemental Mel-Travessura": "img/Elemental-Mel-Travessura.jpeg",
+      "Elemental Salgueiro-Normal": "img/Elemental-Salgueiro-Normal.jpeg",
+      "Elemental Salgueiro-Dourado": "img/Elemental-Salgueiro-Dourado.jpeg",
+      "Elemental Salgueiro-Trapaça": "img/Elemental-Salgueiro-Trapaça.jpeg",
+      "Elemental Salgueiro-Hacker": "img/Elemental-Salgueiro-Hacker.jpeg",
+      "Elemental Salgueiro-Caçador": "img/Elemental-Salgueiro-Cacador.jpeg",
+      "Elemental Salgueiro-Travessura": "img/Elemental-Salgueiro-Travessura.jpeg"
+    };
+
+    /* ---------- Resolução de imagens ----------
+       1º usa o link exato do imageMap (como no código original);
+       só se ele falhar, tenta variações como alternativa. */
        Tenta várias combinações (extensão, maiúsculas/minúsculas, com/sem acento)
        e usa a primeira que carregar. Isso corrige o caso de nomes que não batiam. */
     const EXTS = ["jpeg", "jpg", "png", "webp"];
@@ -327,7 +495,11 @@
     function buildCandidates(item) {
       // Se o item tem caminho explícito (ex.: elemental personalizado), ele vem primeiro
       const list = [];
-      if (item.img && item.img.trim() !== "" && item.img !== "#") list.push(item.img.trim());
+      if (item.img && item.img.trim() !== "" && item.img !== "#") {
+        const p = item.img.trim();
+        list.push(p);                                   // link exato, como no original
+        if (!/^https?:\/\//i.test(p)) list.push(encodeURI(p)); // versão codificada (acentos)
+      }
 
       if (item.prefix && item.fileVariants) {
         const prefixes = uniq([item.prefix, cap(item.prefix), item.prefix.toLowerCase(), stripAccents(item.prefix), cap(stripAccents(item.prefix))]);
@@ -337,7 +509,7 @@
           });
         });
       }
-      return uniq(list).map(p => /^https?:\/\//i.test(p) ? p : encodeURI(p));
+      return uniq(list);
     }
 
     let elementaisData = [];
@@ -353,7 +525,7 @@
           badgeClass: t.badgeClass,
           prefix: el.img,
           fileVariants: t.files,
-          img: "",
+          img: imageMap[`${el.nome}-${t.tipo}`] || imageMap[`${el.alias || el.nome}-${t.tipo}`] || "",
           hidden: IDS_OCULTOS.includes(counter)
         });
         counter++;
@@ -394,8 +566,6 @@
 
       const img = new Image();
       img.alt = `${item.nome} ${item.versao}`;
-      img.loading = 'lazy';
-      img.decoding = 'async';
       let idx = 0;
 
       img.onload = () => {
@@ -481,7 +651,7 @@
           im.className = 'loaded';
           box.appendChild(im);
         } else {
-          io.observe(box);
+          loadImageInto(box, item);
         }
       }
     }
